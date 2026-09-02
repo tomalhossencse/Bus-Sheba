@@ -1,0 +1,30 @@
+model User {
+  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String  @db.VarChar(100)
+  email              String  @unique @db.VarChar(255)
+  phone              String? @unique @db.VarChar(20)
+  needPasswordChange Boolean @default(false)
+  password           String? @db.VarChar(255)
+  emailVerified      Boolean @default(false)
+
+  googlId      String?      @unique
+  authProvider AuthProvider @default(CREDENTIAL)
+
+  role   UserRole   @default(PASSENGER)
+  status UserStatus @default(ACTIVE)
+
+  emailVerifiedAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // operatorProfile OperatorProfile?
+  // bookings        Booking[]
+  // reviews         Review[]
+
+  @@index([email])
+  @@map("users")
+}
