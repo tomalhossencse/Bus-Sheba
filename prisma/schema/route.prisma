@@ -1,0 +1,25 @@
+model Route {
+    id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+    name String @db.VarChar(150)
+
+    source      String @db.VarChar(100)
+    destination String @db.VarChar(100)
+
+    distanceKm Decimal? @db.Decimal(8, 2)
+
+    estimatedMinutes Int?
+
+    isActive Boolean @default(true)
+
+    stops RouteStop[]
+    trips Trip[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([source], name: "idx_route_source")
+    @@index([destination], name: "idx_route_destination")
+    @@index([source, destination], name: "idx_route_source_destination")
+    @@map("routes")
+}

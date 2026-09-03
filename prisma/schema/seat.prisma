@@ -1,0 +1,22 @@
+model Seat {
+    id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+    busId String @db.Uuid
+
+    seatNumber String @db.VarChar(10)
+
+    rowNumber    Int?
+    columnNumber Int?
+
+    isActive Boolean @default(true)
+
+    bus       Bus        @relation(fields: [busId], references: [id], onDelete: Cascade)
+    tripSeats TripSeat[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([busId, seatNumber])
+    @@index([busId])
+    @@map("seats")
+}

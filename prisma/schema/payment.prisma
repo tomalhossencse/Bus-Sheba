@@ -1,0 +1,28 @@
+model Payment {
+    id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    bookingId String          @unique @db.Uuid
+    provider  PaymentProvider @default(BKASH)
+    amount    Decimal         @db.Decimal(10, 2)
+    currency  String          @default("BDT") @db.VarChar(3)
+    trxID     String?         @unique
+
+    merchantInvoiceNumber String        @unique
+    paymentID             String?       @unique
+    payerReference        String?
+    status                PaymentStatus @default(PENDING)
+    paidAt                DateTime?
+
+    refundTrxId  String?
+    refundAmount Decimal? @db.Decimal(10, 2)
+    refundReason String?
+    refundedAt   String?
+
+    gatewayResponse Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+    @@map("payments")
+}

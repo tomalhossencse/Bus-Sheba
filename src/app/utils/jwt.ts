@@ -1,34 +1,33 @@
-import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
-
-const createToken = (
-	payload: JwtPayload,
-	secret: string,
-	expiresIn: SignOptions,
-) => {
-	const token = jwt.sign(payload, secret, {
-		expiresIn,
+import jwt, { SignOptions } from "jsonwebtoken";
+import config from "../config";
+import { JwtPayload } from "../types/types";
+export const signToken = (payload: JwtPayload) => {
+	const accessToken = jwt.sign(payload, config.jwt_access_secret, {
+		expiresIn: config.jwt_access_expires_in,
 	} as SignOptions);
 
-	return token;
+	const refreshToken = jwt.sign(payload, config.jwt_refresh_secret, {
+		expiresIn: config.jwt_refresh_expires_in,
+	} as SignOptions);
+
+	return { accessToken, refreshToken };
 };
 
-const verifyToken = (token: string, secret: string) => {
+export const verifyToken = (token: string, type: "access" | "refresh") => {
 	try {
-		const verifiedToken = jwt.verify(token, secret);
+		const secret =
+			type === "access" ? config.jwt_access_secret : config.jwt_refresh_secret;
+
+		const decoded = jwt.verify(token, secret);
 		return {
 			success: true,
-			data: verifiedToken,
+			data: decoded as JwtPayload,
 		};
 	} catch (error: any) {
-		console.log("Token verification failed:", error);
+		console.log("Token verification Failed");
 		return {
 			success: false,
 			error: error.message,
 		};
 	}
-};
-
-export const jwtUtils = {
-	createToken,
-	verifyToken,
 };

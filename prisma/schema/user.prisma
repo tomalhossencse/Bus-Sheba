@@ -10,20 +10,22 @@ model User {
   googlId      String?      @unique
   authProvider AuthProvider @default(CREDENTIAL)
 
-  role   UserRole   @default(PASSENGER)
+  role   Role       @default(PASSENGER)
   status UserStatus @default(ACTIVE)
 
   emailVerifiedAt DateTime?
+
+  bookings Booking[]
+  reviews  Review[]
+
+  operator          Operator?
+  approvedOperators Operator[] @relation("AdminApprover")
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // operatorProfile OperatorProfile?
-  // bookings        Booking[]
-  // reviews         Review[]
 
   @@index([email])
   @@map("users")

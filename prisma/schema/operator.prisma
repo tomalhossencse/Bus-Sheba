@@ -1,0 +1,32 @@
+model Operator {
+    id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+    userId String @unique @db.Uuid
+    name   String @db.VarChar(100)
+    email  String @unique @db.VarChar(255)
+
+    companyName   String  @db.VarChar(150)
+    contactPerson String? @db.VarChar(100)
+    phone         String? @db.VarChar(20)
+    address       String?
+
+    approvedAt   DateTime?
+    approvedById String?   @db.Uuid
+
+    // relations
+
+    user       User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+    approvedBy User? @relation("AdminApprover", fields: [approvedById], references: [id])
+
+    buses Bus[]
+
+    isDeleted Boolean   @default(false)
+    deletedAt DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([email], name: "idx_operator_email")
+    @@index([isDeleted], name: "idx_operator_isDeleted")
+    @@map("operator_profiles")
+}

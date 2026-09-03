@@ -1,0 +1,33 @@
+model Trip {
+    id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+    busId   String @db.Uuid
+    routeId String @db.Uuid
+
+    travelDate DateTime @db.Date
+
+    departureTime DateTime
+    arrivalTime   DateTime
+
+    fare Decimal @db.Decimal(10, 2)
+
+    status TripStatus @default(SCHEDULED)
+
+    bus Bus @relation(fields: [busId], references: [id], onDelete: Restrict)
+
+    route Route @relation(fields: [routeId], references: [id], onDelete: Restrict)
+
+    tripSeats TripSeat[]
+    bookings  Booking[]
+    reviews   Review[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([busId])
+    @@index([routeId])
+    @@index([travelDate])
+    @@index([status])
+    @@index([routeId, travelDate, status])
+    @@map("trips")
+}

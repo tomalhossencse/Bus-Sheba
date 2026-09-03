@@ -1,0 +1,23 @@
+model RouteStop {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  routeId String @db.Uuid
+
+  stopName String @db.VarChar(100)
+
+  stopOrder Int
+
+  arrivalMinutes   Int?
+  departureMinutes Int?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  route     Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, stopOrder])
+  @@index([routeId], name: "idx_route_stop_routeId")
+  @@map("route_stops")
+}

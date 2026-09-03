@@ -1,4 +1,4 @@
-enum UserRole {
+enum Role {
   SUPER_ADMIN
   ADMIN
   OPERATOR
@@ -9,9 +9,61 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   BLOCKED
+  DELETED
 }
 
 enum AuthProvider {
   GOOGLE
   CREDENTIAL
+}
+
+enum BusType {
+  AC
+  NON_AC
+  SLEEPER
+  SEMI_SLEEPER
+}
+
+enum BusStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum TripStatus {
+  SCHEDULED
+  BOARDING
+  DEPARTED
+  COMPLETED
+  CANCELLED
+}
+
+enum TripSeatStatus {
+  AVAILABLE
+  HELD
+  BOOKED
+  BLOCKED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  EXPIRED
+}
+
+enum PaymentProvider {
+  SSLCOMMERZ
+  STRIPE
+  BKASH
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
 }
