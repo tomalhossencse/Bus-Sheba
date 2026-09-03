@@ -11,11 +11,15 @@ model Operator {
     address       String?
 
     // Business Information
+    nidNumber              String? @db.VarChar(50)
     tradeLicenseNo         String? @unique @db.VarChar(100)
     businessRegistrationNo String? @unique @db.VarChar(100)
     taxIdentificationNo    String? @db.VarChar(50)
 
     // Verification Documents
+    nidDocument String?
+    nidPublicId String?
+
     tradeLicenseDocument String?
     tradeLicensePublicId String?
 
@@ -25,17 +29,17 @@ model Operator {
     taxCertificateDocument String?
     taxCertificatePublicId String?
 
-    otherDocument Json?
+    additionalDocuments Json?
 
     verificationStatus OperatorVerificationStatus @default(PENDING)
-    approvedAt         DateTime?
-    approvedById       String?                    @db.Uuid
+    reviewedAt         DateTime?
+    reviewedById       String?                    @db.Uuid
     rejectionReason    String?
 
     // relations
 
-    user       User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-    approvedBy User? @relation("AdminApprover", fields: [approvedById], references: [id])
+    user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    reviewedBy User? @relation("AdminReviewer", fields: [reviewedById], references: [id])
 
     buses Bus[]
 

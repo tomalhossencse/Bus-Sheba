@@ -20,7 +20,7 @@ model User {
   reviews  Review[]
 
   operator          Operator?
-  approvedOperators Operator[] @relation("AdminApprover")
+  reviewedOperators Operator[] @relation("AdminReviewer")
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?

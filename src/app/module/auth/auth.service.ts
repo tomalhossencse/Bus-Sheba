@@ -5,7 +5,6 @@ import { prisma } from "../../lib/prisma";
 import {
 	ILoginUserPayload,
 	IRegisterPassengerPayload,
-	IRequestUser,
 	IVerifyPassengerPayload,
 } from "./auth.interface";
 import { Role, UserStatus } from "../../../generated/prisma/enums";
@@ -17,6 +16,7 @@ import { radisClient } from "../../lib/redis";
 import path from "path";
 import ejs from "ejs";
 import { transporter } from "../../lib/nodemailer";
+import { RequestUser } from "../../types/types";
 
 const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 	const { name, password } = payload;
@@ -175,7 +175,7 @@ const verifyPassenger = async (payload: IVerifyPassengerPayload) => {
 	});
 
 	const jwtPayload = {
-		userId: createdUser.id,
+		id: createdUser.id,
 		name: createdUser.name,
 		email: createdUser.email,
 		role: createdUser.role,
@@ -231,7 +231,7 @@ const loginUser = async (payload: ILoginUserPayload) => {
 	}
 
 	const jwtPayload = {
-		userId: user.id,
+		id: user.id,
 		name: user.name,
 		email: user.email,
 		role: user.role,
@@ -245,10 +245,10 @@ const loginUser = async (payload: ILoginUserPayload) => {
 	};
 };
 
-const getMe = async (user: IRequestUser) => {
+const getMe = async (user: RequestUser) => {
 	const isUserExists = await prisma.user.findUnique({
 		where: {
-			id: user.userId,
+			id: user.id,
 		},
 		omit: {
 			password: true,
@@ -277,7 +277,7 @@ const refreshToken = async (token: string) => {
 	const data = verifiedRefreshToken.data as JwtPayload;
 
 	const user = await prisma.user.findUnique({
-		where: { id: data.userId },
+		where: { id: data.id },
 	});
 
 	if (!user || user.isDeleted || user.status !== UserStatus.ACTIVE) {
@@ -285,7 +285,7 @@ const refreshToken = async (token: string) => {
 	}
 
 	const jwtPayload = {
-		userId: user.id,
+		id: user.id,
 		name: user.name,
 		email: user.email,
 		role: user.role,

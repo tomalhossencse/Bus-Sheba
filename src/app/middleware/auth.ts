@@ -29,7 +29,7 @@ export const auth = (...roles: Role[]) => {
 
 		const user = await prisma.user.findUnique({
 			where: {
-				id: verifiedToken.data?.userId,
+				id: verifiedToken.data?.id,
 			},
 		});
 

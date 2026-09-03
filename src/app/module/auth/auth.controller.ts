@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
+import { RequestUser } from "../../types/types";
 
 const registerPassenger = catchAsync(async (req: Request, res: Response) => {
 	await AuthService.registerPassenger(req.body);
@@ -77,7 +77,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-	const user = req.user as unknown as IRequestUser;
+	const user = req.user as unknown as RequestUser;
 
 	if (!user) {
 		throw new Error("User information is missing in the request");

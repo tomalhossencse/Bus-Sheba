@@ -3,6 +3,11 @@ import config from "./app/config";
 import { transporter } from "./app/lib/nodemailer";
 import { prisma } from "./app/lib/prisma";
 import { radisClient } from "./app/lib/redis";
+import {
+	seedSuperAdmin,
+	seedTesterAdmin,
+	seedTesterOperator,
+} from "./app/utils/seed";
 
 const PORT = config.port;
 
@@ -19,6 +24,10 @@ const main = async () => {
 		app.listen(PORT, () => {
 			console.log(`🌐 Server is running on port ${PORT}`);
 		});
+
+		await seedSuperAdmin();
+		await seedTesterAdmin();
+		await seedTesterOperator();
 	} catch (error) {
 		console.error("Error starting the server:", error);
 		await prisma.$disconnect();

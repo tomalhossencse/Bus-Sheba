@@ -18,3 +18,18 @@ export const validateRequest = (zodSchema: ZodObject) => {
 		next();
 	});
 };
+
+export const validateRequestForApplyOperator = (zodSchema: ZodObject) => {
+	return catchAsync((req: Request, res: Response, next: NextFunction) => {
+		const rawData = JSON.parse(req.body.data);
+		const payload = zodSchema.safeParse(rawData);
+		if (!payload.success) {
+			throw new AppError(
+				httpStatus.BAD_REQUEST,
+				payload.error.issues[0].message,
+			);
+		}
+		req.body = payload.data;
+		next();
+	});
+};
