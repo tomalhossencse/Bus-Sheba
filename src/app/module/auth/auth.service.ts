@@ -9,8 +9,14 @@ import {
 } from "./auth.interface";
 import { Role, UserStatus } from "../../../generated/prisma/enums";
 import { signToken, verifyToken } from "../../utils/jwt";
-import { AppError } from "../../utils/appError";
+import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
+import crypto from "crypto";
+import { radisClient } from "../../lib/redis";
+import path from "path";
+import ejs from "ejs";
+import { transporter } from "../../lib/nodemailer";
+
 const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 	const { name, password } = payload;
 	const email = payload.email.trim().toLowerCase();
@@ -20,7 +26,10 @@ const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 	});
 
 	if (isUserExists) {
-		throw new Error("User with this email already exists");
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"User already exists with this email. Please try to login.",
+		);
 	}
 
 	const hashedPassword = await bcrypt.hash(
@@ -28,36 +37,55 @@ const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 		Number(config.bcrypt_salt_rounds),
 	);
 
-	const createdUser = await prisma.user.create({
-		data: {
-			name,
-			email,
-			password: hashedPassword,
-			role: Role.PASSENGER,
-			status: UserStatus.ACTIVE,
-			emailVerified: false,
-			patient: {
-				create: { name, email },
-			},
+	const otpKey = `patient-registraton-otp:${email}`;
+	const otpValue = crypto.randomInt(100000, 1000000).toString();
+	const expirationSeconds = 60 * 2;
+
+	await radisClient.set(otpKey, otpValue, {
+		expiration: {
+			type: "EX",
+			value: expirationSeconds,
 		},
-		omit: { password: true },
 	});
 
-	const { ...user } = createdUser;
-	const jwtPayload = {
-		userId: user.id,
-		name: user.name,
-		email: user.email,
-		role: user.role,
+	const passengerRegistrationKey = `passenger-registration-data:${email}`;
+
+	const passengerData = {
+		name,
+		email,
+		password: hashedPassword,
 	};
 
-	const { accessToken, refreshToken } = signToken(jwtPayload);
+	await radisClient.set(
+		passengerRegistrationKey,
+		JSON.stringify(passengerData),
+		{
+			expiration: {
+				type: "EX",
+				value: expirationSeconds,
+			},
+		},
+	);
 
-	return {
-		user,
-		accessToken,
-		refreshToken,
+	const templatePath = path.join(
+		process.cwd(),
+		"src/app/templates/registration-otp.ejs",
+	);
+
+	const templateData = {
+		name,
+		otp: otpValue,
+		expirationMinutes: expirationSeconds / 60,
 	};
+
+	const html = await ejs.renderFile(templatePath, templateData);
+
+	await transporter.sendMail({
+		from: config.email_sender,
+		to: email,
+		subject: "Verify Your Account - PH Healthcare System",
+		html,
+	});
 };
 
 const loginUser = async (payload: ILoginUserPayload) => {

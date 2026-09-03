@@ -4,7 +4,7 @@ import { verifyToken } from "../utils/jwt";
 import httpStatus from "http-status";
 import { prisma } from "../lib/prisma";
 import { Role } from "../../generated/prisma/enums";
-import { AppError } from "../utils/appError";
+import { AppError } from "../utils/AppError";
 
 export const auth = (...roles: Role[]) => {
 	return catchAsync(async (req: Request, res: Response, next: NextFunction) => {

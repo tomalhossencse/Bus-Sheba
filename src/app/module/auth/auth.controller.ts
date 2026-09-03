@@ -6,33 +6,14 @@ import { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
 
 const registerPassenger = catchAsync(async (req: Request, res: Response) => {
-	const payload = req.body;
-	const result = await AuthService.registerPassenger(payload);
-
-	const { accessToken, refreshToken, user } = result;
-
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
+	await AuthService.registerPassenger(req.body);
 
 	sendResponse(res, {
 		statusCode: httpStatus.CREATED,
 		success: true,
-		message: "Patient registered successfully",
-		data: {
-			accessToken,
-			refreshToken,
-			user,
-		},
+		message:
+			"Please verify your email with the OTP sent to your email address.",
+		data: null,
 	});
 });
 

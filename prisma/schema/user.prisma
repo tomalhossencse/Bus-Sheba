@@ -1,14 +1,14 @@
 model User {
-  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name               String  @db.VarChar(100)
-  email              String  @unique @db.VarChar(255)
-  phone              String? @unique @db.VarChar(20)
-  needPasswordChange Boolean @default(false)
-  password           String? @db.VarChar(255)
-  emailVerified      Boolean @default(false)
+  id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String  @db.VarChar(100)
+  email         String  @unique @db.VarChar(255)
+  phone         String? @unique @db.VarChar(20)
+  password      String? @db.VarChar(255)
+  emailVerified Boolean @default(false)
 
-  googlId      String?      @unique
-  authProvider AuthProvider @default(CREDENTIAL)
+  googlId            String?      @unique
+  needPasswordChange Boolean      @default(false)
+  authProvider       AuthProvider @default(CREDENTIAL)
 
   role   Role       @default(PASSENGER)
   status UserStatus @default(ACTIVE)
