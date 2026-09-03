@@ -10,8 +10,27 @@ model Operator {
     phone         String? @db.VarChar(20)
     address       String?
 
-    approvedAt   DateTime?
-    approvedById String?   @db.Uuid
+    // Business Information
+    tradeLicenseNo         String? @unique @db.VarChar(100)
+    businessRegistrationNo String? @unique @db.VarChar(100)
+    taxIdentificationNo    String? @db.VarChar(50)
+
+    // Verification Documents
+    tradeLicenseDocument String?
+    tradeLicensePublicId String?
+
+    businessRegistrationDocument String?
+    businessRegistrationPublicId String?
+
+    taxCertificateDocument String?
+    taxCertificatePublicId String?
+
+    otherDocument Json?
+
+    verificationStatus OperatorVerificationStatus @default(PENDING)
+    approvedAt         DateTime?
+    approvedById       String?                    @db.Uuid
+    rejectionReason    String?
 
     // relations
 
@@ -28,5 +47,5 @@ model Operator {
 
     @@index([email], name: "idx_operator_email")
     @@index([isDeleted], name: "idx_operator_isDeleted")
-    @@map("operator_profiles")
+    @@map("operators")
 }
