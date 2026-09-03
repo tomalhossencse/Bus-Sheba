@@ -17,3 +17,8 @@ export interface IRequestUser {
 	name: string;
 	role: Role;
 }
+
+export interface IVerifyPassengerPayload {
+	otp: string;
+	email: string;
+}

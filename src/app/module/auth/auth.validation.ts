@@ -15,3 +15,21 @@ export const PassengerRegistrationZodSchema = z.object({
 			message: "Contain at least one special character",
 		}),
 });
+
+export const PassengerVerifyZodSchema = z.object({
+	email: z.email("Invalid email address"),
+	otp: z.string().length(6, { message: "OTP must be exactly 6 characters" }),
+});
+
+export const LoginZodSchema = z.object({
+	email: z.email("Invalid email address"),
+	password: z
+		.string("Password must be a string")
+		.min(8, { message: "Password must be at least 8 characters long" })
+		.regex(/[A-Z]/, { message: "Contain at least one uppercase letter" })
+		.regex(/[a-z]/, { message: "Contain at least one lowercase letter" })
+		.regex(/[0-9]/, { message: "Contain at least one number" })
+		.regex(/[^A-Za-z0-9]/, {
+			message: "Contain at least one special character",
+		}),
+});

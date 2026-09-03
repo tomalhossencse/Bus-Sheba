@@ -6,13 +6,14 @@ model User {
   password      String? @db.VarChar(255)
   emailVerified Boolean @default(false)
 
-  googlId            String?      @unique
   needPasswordChange Boolean      @default(false)
   authProvider       AuthProvider @default(CREDENTIAL)
+  role               Role         @default(PASSENGER)
+  status             UserStatus   @default(ACTIVE)
 
-  role   Role       @default(PASSENGER)
-  status UserStatus @default(ACTIVE)
-
+  googlId         String?   @unique
+  image           String?
+  imagePublicId   String?
   emailVerifiedAt DateTime?
 
   bookings Booking[]

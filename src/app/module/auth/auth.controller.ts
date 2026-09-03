@@ -17,6 +17,36 @@ const registerPassenger = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const verifyPassenger = catchAsync(async (req: Request, res: Response) => {
+	const { accessToken, refreshToken, user } = await AuthService.verifyPassenger(
+		req.body,
+	);
+
+	res.cookie("accessToken", accessToken, {
+		httpOnly: true,
+		secure: false,
+		sameSite: "none",
+		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
+	});
+	res.cookie("refreshToken", refreshToken, {
+		httpOnly: true,
+		secure: false,
+		sameSite: "none",
+		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+	});
+
+	sendResponse(res, {
+		statusCode: httpStatus.CREATED,
+		success: true,
+		message: "Passenger verified successfully.",
+		data: {
+			accessToken,
+			refreshToken,
+			user,
+		},
+	});
+});
+
 const loginUser = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
 	const result = await AuthService.loginUser(payload);
@@ -95,6 +125,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
 export const AuthController = {
 	registerPassenger,
+	verifyPassenger,
 	loginUser,
 	getMe,
 	refreshToken,

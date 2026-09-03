@@ -6,6 +6,7 @@ import {
 	ILoginUserPayload,
 	IRegisterPassengerPayload,
 	IRequestUser,
+	IVerifyPassengerPayload,
 } from "./auth.interface";
 import { Role, UserStatus } from "../../../generated/prisma/enums";
 import { signToken, verifyToken } from "../../utils/jwt";
@@ -37,7 +38,7 @@ const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 		Number(config.bcrypt_salt_rounds),
 	);
 
-	const otpKey = `patient-registraton-otp:${email}`;
+	const otpKey = `passenger-registraton-otp:${email}`;
 	const otpValue = crypto.randomInt(100000, 1000000).toString();
 	const expirationSeconds = 60 * 2;
 
@@ -83,9 +84,110 @@ const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 	await transporter.sendMail({
 		from: config.email_sender,
 		to: email,
-		subject: "Verify Your Account - PH Healthcare System",
+		subject: "Verify Your Account - Bus Sheba System",
 		html,
 	});
+};
+
+const verifyPassenger = async (payload: IVerifyPassengerPayload) => {
+	const otp = payload.otp;
+
+	const email = payload.email.trim().toLowerCase();
+
+	const isUserExist = await prisma.user.findUnique({
+		where: { email },
+	});
+
+	if (isUserExist?.emailVerified) {
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"User with this email already exists",
+		);
+	}
+
+	if (isUserExist?.status === "BLOCKED") {
+		throw new AppError(httpStatus.FORBIDDEN, "User is blocked");
+	}
+
+	if (isUserExist?.isDeleted || isUserExist?.status === "DELETED") {
+		throw new AppError(httpStatus.NOT_FOUND, "User is deleted");
+	}
+
+	if (isUserExist?.emailVerified) {
+		throw new AppError(httpStatus.CONFLICT, "Your Email already verified");
+	}
+
+	const otpKey = `passenger-registraton-otp:${email}`;
+
+	const redisOtp = await radisClient.get(otpKey);
+
+	if (!redisOtp) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
+	}
+
+	if (redisOtp !== otp) {
+		throw new AppError(httpStatus.BAD_REQUEST, "OTP does not match");
+	}
+
+	await radisClient.del(otpKey);
+
+	const passengerRegistrationKey = `passenger-registration-data:${email}`;
+
+	const redisPassengerData = await radisClient.get(passengerRegistrationKey);
+
+	if (!redisPassengerData) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Passenger does not exists");
+	}
+
+	const passengerPayload: IRegisterPassengerPayload =
+		JSON.parse(redisPassengerData);
+
+	const createdUser = await prisma.user.create({
+		data: {
+			name: passengerPayload.name,
+			email: passengerPayload.email,
+			password: passengerPayload.password,
+			role: Role.PASSENGER,
+			status: UserStatus.ACTIVE,
+			emailVerified: true,
+		},
+		omit: { password: true },
+	});
+
+	await radisClient.del(passengerRegistrationKey);
+
+	const templatePath = path.join(
+		process.cwd(),
+		"src/app/templates/passenger-welcome-email.ejs",
+	);
+
+	const templateData = {
+		name: createdUser.name,
+	};
+
+	const html = await ejs.renderFile(templatePath, templateData);
+
+	await transporter.sendMail({
+		from: config.email_sender,
+		to: email,
+		subject: "Welcome to Bus Sheba System",
+		html,
+	});
+
+	const jwtPayload = {
+		userId: createdUser.id,
+		name: createdUser.name,
+		email: createdUser.email,
+		role: createdUser.role,
+	};
+
+	const { accessToken, refreshToken } = signToken(jwtPayload);
+
+	return {
+		user: createdUser,
+		accessToken,
+		refreshToken,
+	};
 };
 
 const loginUser = async (payload: ILoginUserPayload) => {
@@ -199,6 +301,7 @@ const refreshToken = async (token: string) => {
 
 export const AuthService = {
 	registerPassenger,
+	verifyPassenger,
 	loginUser,
 	getMe,
 	refreshToken,

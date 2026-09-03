@@ -1,0 +1,545 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="x-apple-disable-message-reformatting" />
+
+        <title>Welcome to BUS SHEBA</title>
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                background-color: #f1f5f9;
+                font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            table {
+                border-spacing: 0;
+                border-collapse: collapse;
+            }
+
+            img {
+                border: 0;
+                max-width: 100%;
+                height: auto;
+            }
+
+            @media only screen and (max-width: 640px) {
+                .email-wrapper {
+                    padding: 20px 10px !important;
+                }
+
+                .email-container {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    border-radius: 16px !important;
+                }
+
+                .header {
+                    padding: 32px 20px 30px !important;
+                }
+
+                .header-title {
+                    font-size: 24px !important;
+                }
+
+                .header-subtitle {
+                    font-size: 14px !important;
+                }
+
+                .header-icon {
+                    width: 58px !important;
+                    height: 58px !important;
+                    line-height: 58px !important;
+                    font-size: 28px !important;
+                }
+
+                .content {
+                    padding: 30px 20px !important;
+                }
+
+                .content-title {
+                    font-size: 22px !important;
+                }
+
+                .content-text {
+                    font-size: 15px !important;
+                    line-height: 1.7 !important;
+                }
+
+                .welcome-card {
+                    padding: 22px 16px !important;
+                }
+
+                .footer {
+                    padding: 22px 16px !important;
+                }
+            }
+
+            @media only screen and (max-width: 400px) {
+                .email-wrapper {
+                    padding: 10px 5px !important;
+                }
+
+                .email-container {
+                    border-radius: 12px !important;
+                }
+
+                .header {
+                    padding: 28px 16px !important;
+                }
+
+                .header-title {
+                    font-size: 21px !important;
+                }
+
+                .content {
+                    padding: 25px 16px !important;
+                }
+
+                .content-title {
+                    font-size: 20px !important;
+                }
+
+                .content-text {
+                    font-size: 14px !important;
+                }
+
+                .welcome-card {
+                    padding: 20px 14px !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="width: 100%; background-color: #f1f5f9"
+        >
+            <tr>
+                <td
+                    class="email-wrapper"
+                    align="center"
+                    style="padding: 40px 15px"
+                >
+                    <!-- Main Container -->
+                    <table
+                        role="presentation"
+                        class="email-container"
+                        width="620"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="
+                            width: 100%;
+                            max-width: 620px;
+                            background-color: #ffffff;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 20px;
+                            overflow: hidden;
+                            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
+                        "
+                    >
+                        <!-- Header -->
+                        <tr>
+                            <td
+                                class="header"
+                                align="center"
+                                style="
+                                    padding: 42px 30px 38px;
+                                    background-color: #0f766e;
+                                    background-image: linear-gradient(
+                                        135deg,
+                                        #0f766e 0%,
+                                        #0891b2 50%,
+                                        #2563eb 100%
+                                    );
+                                    color: #ffffff;
+                                "
+                            >
+                                <!-- Welcome Icon -->
+                                <div
+                                    class="header-icon"
+                                    style="
+                                        width: 64px;
+                                        height: 64px;
+                                        line-height: 64px;
+                                        margin: 0 auto 18px;
+                                        background-color: rgba(
+                                            255,
+                                            255,
+                                            255,
+                                            0.18
+                                        );
+                                        border: 2px solid
+                                            rgba(255, 255, 255, 0.4);
+                                        border-radius: 18px;
+                                        font-size: 30px;
+                                        font-weight: bold;
+                                        color: #ffffff;
+                                    "
+                                >
+                                    🚌
+                                </div>
+
+                                <h1
+                                    class="header-title"
+                                    style="
+                                        margin: 0;
+                                        font-size: 28px;
+                                        line-height: 1.3;
+                                        font-weight: 700;
+                                        color: #ffffff;
+                                    "
+                                >
+                                    Welcome to BUS SHEBA!
+                                </h1>
+
+                                <p
+                                    class="header-subtitle"
+                                    style="
+                                        margin: 10px 0 0;
+                                        font-size: 15px;
+                                        line-height: 1.6;
+                                        color: rgba(255, 255, 255, 0.9);
+                                    "
+                                >
+                                    Your account has been successfully verified
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!-- Content -->
+                        <tr>
+                            <td
+                                class="content"
+                                style="padding: 42px 42px 35px; color: #334155"
+                            >
+                                <h2
+                                    class="content-title"
+                                    style="
+                                        margin: 0 0 18px;
+                                        color: #0f172a;
+                                        font-size: 24px;
+                                        line-height: 1.4;
+                                        font-weight: 700;
+                                    "
+                                >
+                                    Hello, <%= name %>! 👋
+                                </h2>
+
+                                <p
+                                    class="content-text"
+                                    style="
+                                        margin: 0 0 16px;
+                                        font-size: 16px;
+                                        line-height: 1.8;
+                                        color: #475569;
+                                    "
+                                >
+                                    Congratulations! Your email has been
+                                    successfully verified, and your
+                                    <strong style="color: #0f172a">
+                                        BUS SHEBA
+                                    </strong>
+                                    account is now active.
+                                </p>
+
+                                <!-- Welcome Card -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin: 28px 0;
+                                        background-color: #ecfdf5;
+                                        background-image: linear-gradient(
+                                            135deg,
+                                            #ecfdf5 0%,
+                                            #eff6ff 100%
+                                        );
+                                        border: 1px solid #a7f3d0;
+                                        border-radius: 16px;
+                                    "
+                                >
+                                    <tr>
+                                        <td
+                                            class="welcome-card"
+                                            align="center"
+                                            style="padding: 26px 20px"
+                                        >
+                                            <div
+                                                style="
+                                                    width: 54px;
+                                                    height: 54px;
+                                                    line-height: 54px;
+                                                    margin: 0 auto 14px;
+                                                    background-color: #059669;
+                                                    border-radius: 50%;
+                                                    color: #ffffff;
+                                                    font-size: 28px;
+                                                    font-weight: bold;
+                                                "
+                                            >
+                                                ✓
+                                            </div>
+
+                                            <h3
+                                                style="
+                                                    margin: 0 0 8px;
+                                                    font-size: 19px;
+                                                    line-height: 1.4;
+                                                    color: #047857;
+                                                "
+                                            >
+                                                Your Account Is Ready!
+                                            </h3>
+
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0;
+                                                    font-size: 14px;
+                                                    line-height: 1.7;
+                                                    color: #065f46;
+                                                "
+                                            >
+                                                You can now search for buses,
+                                                choose your preferred seats,
+                                                book tickets, and travel with
+                                                BUS SHEBA.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Features -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 26px;
+                                        background-color: #f8fafc;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 14px;
+                                    "
+                                >
+                                    <tr>
+                                        <td
+                                            class="welcome-card"
+                                            style="padding: 22px"
+                                        >
+                                            <h3
+                                                style="
+                                                    margin: 0 0 14px;
+                                                    font-size: 17px;
+                                                    color: #0f172a;
+                                                "
+                                            >
+                                                With your account, you can:
+                                            </h3>
+
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0 0 10px;
+                                                    font-size: 14px;
+                                                    line-height: 1.7;
+                                                    color: #475569;
+                                                "
+                                            >
+                                                ✓ Search buses by route and
+                                                travel date
+                                            </p>
+
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0 0 10px;
+                                                    font-size: 14px;
+                                                    line-height: 1.7;
+                                                    color: #475569;
+                                                "
+                                            >
+                                                ✓ Choose your preferred seats
+                                                easily
+                                            </p>
+
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0 0 10px;
+                                                    font-size: 14px;
+                                                    line-height: 1.7;
+                                                    color: #475569;
+                                                "
+                                            >
+                                                ✓ Book and manage your bus
+                                                tickets
+                                            </p>
+
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0;
+                                                    font-size: 14px;
+                                                    line-height: 1.7;
+                                                    color: #475569;
+                                                "
+                                            >
+                                                ✓ Make secure online payments
+                                                and access your tickets
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Security Notice -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        background-color: #f0f9ff;
+                                        border-left: 4px solid #0284c7;
+                                        border-radius: 8px;
+                                    "
+                                >
+                                    <tr>
+                                        <td
+                                            class="welcome-card"
+                                            style="padding: 18px"
+                                        >
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0;
+                                                    font-size: 14px;
+                                                    line-height: 1.7;
+                                                    color: #475569;
+                                                "
+                                            >
+                                                <strong style="color: #0f172a">
+                                                    🔒 Keep Your Account Secure
+                                                </strong>
+                                                <br />
+                                                Never share your password or
+                                                account information with anyone.
+                                                BUS SHEBA will never ask for
+                                                your password through email or
+                                                messages.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Signature -->
+                                <div
+                                    style="
+                                        margin-top: 34px;
+                                        padding-top: 24px;
+                                        border-top: 1px solid #e2e8f0;
+                                    "
+                                >
+                                    <p
+                                        class="content-text"
+                                        style="
+                                            margin: 0;
+                                            font-size: 15px;
+                                            line-height: 1.7;
+                                            color: #475569;
+                                        "
+                                    >
+                                        Thank you for choosing BUS SHEBA.
+                                        <br /><br />
+
+                                        Safe travels,
+                                        <br />
+                                        <strong
+                                            style="
+                                                color: #0f172a;
+                                                font-size: 16px;
+                                            "
+                                        >
+                                            BUS SHEBA Team
+                                        </strong>
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td
+                                class="footer"
+                                align="center"
+                                style="
+                                    padding: 26px 30px;
+                                    background-color: #f8fafc;
+                                    background-image: linear-gradient(
+                                        135deg,
+                                        #f8fafc 0%,
+                                        #eef2ff 100%
+                                    );
+                                    border-top: 1px solid #e2e8f0;
+                                "
+                            >
+                                <p
+                                    style="
+                                        margin: 0;
+                                        font-size: 13px;
+                                        line-height: 1.6;
+                                        color: #64748b;
+                                    "
+                                >
+                                    © <%= new Date().getFullYear() %>
+                                    <strong style="color: #334155">
+                                        BUS SHEBA
+                                    </strong>
+                                    . All rights reserved.
+                                </p>
+
+                                <p
+                                    style="
+                                        margin: 8px 0 0;
+                                        font-size: 12px;
+                                        line-height: 1.6;
+                                        color: #94a3b8;
+                                    "
+                                >
+                                    This is an automated welcome email. Please
+                                    do not reply directly to this message.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
+```
