@@ -107,6 +107,7 @@ const addRouteStop = async (
 				stopOrder: {
 					increment: 1,
 				},
+				updatedAt: new Date(),
 			},
 		});
 

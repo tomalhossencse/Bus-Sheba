@@ -17,6 +17,9 @@ model RouteStop {
   updatedAt DateTime @updatedAt
   route     Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
+  bookingsFrom Booking[] @relation("BookingFromStop")
+  bookingsTo   Booking[] @relation("BookingToStop")
+
   @@unique([routeId, stopOrder])
   @@index([routeId], name: "idx_route_stop_routeId")
   @@map("route_stops")
