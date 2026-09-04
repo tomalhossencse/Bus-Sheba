@@ -2,17 +2,20 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
-import { RouteService } from "./route.service";
 import { RequestUser } from "../../types/types";
+import { TripService } from "./trip.service";
 
-const addRoute = catchAsync(async (req: Request, res: Response) => {
-	const result = await RouteService.addRoute(req.body, req.user as RequestUser);
+const createTrip = catchAsync(async (req: Request, res: Response) => {
+	const result = await TripService.createTrip(
+		req.body,
+		req.user as RequestUser,
+	);
 	sendResponse(res, {
 		statusCode: httpStatus.CREATED,
 		success: true,
-		message: "New route added successfully",
+		message: "Trip created successfully",
 		data: result,
 	});
 });
 
-export const RouteController = { addRoute };
+export const TripController = { createTrip };

@@ -14,6 +14,7 @@ import { OperatorRoutes } from "./app/module/operator/operator.route";
 import { BusRoutes } from "./app/module/bus/bus.route";
 import { RouteRoutes } from "./app/module/route/route.route";
 import { RouteStopRoutes } from "./app/module/routeStop/routeStop.route";
+import { TripRoutes } from "./app/module/trip/trip.route";
 
 const app: Application = express();
 
@@ -36,6 +37,7 @@ app.use("/api/v1/operator", OperatorRoutes);
 app.use("/api/v1/bus", BusRoutes);
 app.use("/api/v1/route", RouteRoutes);
 app.use("/api/v1/route-stop", RouteStopRoutes);
+app.use("/api/v1/trip", TripRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

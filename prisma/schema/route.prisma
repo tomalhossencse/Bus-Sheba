@@ -18,8 +18,8 @@ model Route {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@unique([source, destination, name], name: "idx_route_source_destination")
     @@index([source], name: "idx_route_source")
     @@index([destination], name: "idx_route_destination")
-    @@index([source, destination], name: "idx_route_source_destination")
     @@map("routes")
 }

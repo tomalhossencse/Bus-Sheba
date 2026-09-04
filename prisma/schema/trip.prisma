@@ -24,10 +24,11 @@ model Trip {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([busId])
-    @@index([routeId])
-    @@index([travelDate])
-    @@index([status])
-    @@index([routeId, travelDate, status])
+    @@unique([routeId, travelDate, departureTime], name: "unique_trip_per_route_per_day")
+    @@unique([busId, travelDate, departureTime], name: "unique_trip_per_bus_per_day")
+    @@index([busId], name: "idx_busId")
+    @@index([routeId], name: "idx_routeId")
+    @@index([travelDate], name: "idx_travelDate")
+    @@index([status], name: "idx_status")
     @@map("trips")
 }
