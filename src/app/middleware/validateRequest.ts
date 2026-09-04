@@ -1,4 +1,4 @@
-import { ZodObject } from "zod";
+import { ZodObject, ZodArray } from "zod";
 import { catchAsync } from "../utils/catchAsync";
 import { NextFunction, Response } from "express";
 import { Request } from "express";
@@ -14,6 +14,22 @@ export const validateRequest = (zodSchema: ZodObject) => {
 				payload.error.issues[0].message,
 			);
 		}
+		req.body = payload.data;
+		next();
+	});
+};
+
+export const validateRequestForArray = (zodSchema: ZodArray) => {
+	return catchAsync((req: Request, res: Response, next: NextFunction) => {
+		const payload = zodSchema.safeParse(req.body);
+
+		if (!payload.success) {
+			throw new AppError(
+				httpStatus.BAD_REQUEST,
+				payload.error.issues[0].message,
+			);
+		}
+
 		req.body = payload.data;
 		next();
 	});
