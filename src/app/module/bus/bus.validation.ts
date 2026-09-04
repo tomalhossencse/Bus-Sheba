@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BusType } from "../../../generated/prisma/enums";
+import { BusType, SeatLayout } from "../../../generated/prisma/enums";
 
 export const addBusSchema = z.object({
 	name: z
@@ -19,6 +19,12 @@ export const addBusSchema = z.object({
 	busType: z.enum(BusType, {
 		message: `Invalid bus type. Must be one of: ${Object.values(BusType).join(", ")}`,
 	}),
+
+	seatLayout: z
+		.enum(SeatLayout, {
+			message: "Invalid seat layout type",
+		})
+		.optional(),
 
 	totalSeats: z
 		.number({ message: "Total seats must be a number" })

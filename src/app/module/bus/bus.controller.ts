@@ -6,8 +6,11 @@ import { sendResponse } from "../../utils/sendResponse";
 import { RequestUser } from "../../types/types";
 import { BusService } from "./bus.service";
 
-const addBus = catchAsync(async (req: Request, res: Response) => {
-	const result = await BusService.addBus(req.body, req.user as RequestUser);
+const addBusWithSeatLayout = catchAsync(async (req: Request, res: Response) => {
+	const result = await BusService.addBusWithSeatLayout(
+		req.body,
+		req.user as RequestUser,
+	);
 
 	sendResponse(res, {
 		statusCode: httpStatus.CREATED,
@@ -18,5 +21,5 @@ const addBus = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const BusController = {
-	addBus,
+	addBusWithSeatLayout,
 };

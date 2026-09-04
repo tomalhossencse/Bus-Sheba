@@ -7,6 +7,7 @@ model Bus {
     registrationNo String @unique @db.VarChar(50)
 
     busType    BusType
+    seatLayout SeatLayout @default(TWO_BY_TWO)
     totalSeats Int
 
     status BusStatus @default(ACTIVE)

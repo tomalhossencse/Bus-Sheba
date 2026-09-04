@@ -30,6 +30,12 @@ enum BusType {
   SEMI_SLEEPER
 }
 
+enum SeatLayout {
+  TWO_BY_TWO
+  ONE_BY_TWO
+  TWO_BY_ONE
+}
+
 enum BusStatus {
   ACTIVE
   INACTIVE

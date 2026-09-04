@@ -10,7 +10,7 @@ router.post(
 	"/add",
 	auth("OPERATOR"),
 	validateRequest(addBusSchema),
-	BusController.addBus,
+	BusController.addBusWithSeatLayout,
 );
 
 export const BusRoutes = router;
