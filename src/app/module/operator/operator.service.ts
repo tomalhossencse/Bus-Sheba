@@ -23,14 +23,14 @@ const applyAsOperator = async (
 	tradeLicenseDocument: Express.Multer.File | null,
 	additionalDocuments: Express.Multer.File[],
 ) => {
-	const isOperatorExist = await prisma.operator.findUnique({
+	const isUserExist = await prisma.user.findUnique({
 		where: { email: payload.user.email },
 	});
 
-	if (isOperatorExist) {
+	if (isUserExist) {
 		throw new AppError(
 			httpStatus.CONFLICT,
-			"Operator with this email already exists",
+			"User with this email already exists",
 		);
 	}
 
@@ -155,7 +155,7 @@ const applyAsOperator = async (
 
 	const otpKey = `operator-registration-otp:${payload.user.email}`;
 	const otpValue = crypto.randomInt(100000, 1000000).toString();
-	const expirationSeconds = 60 * 2;
+	const expirationSeconds = 60 * 5; // 5 minutes
 
 	await radisClient.set(otpKey, otpValue, {
 		expiration: {

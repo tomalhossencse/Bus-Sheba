@@ -128,7 +128,7 @@ export const seedTesterOperator = async () => {
 			Number(config.bcrypt_salt_rounds),
 		);
 
-		const testerDoctor = await prisma.user.create({
+		const testerOperator = await prisma.user.create({
 			data: {
 				name,
 				email,
@@ -152,7 +152,7 @@ export const seedTesterOperator = async () => {
 			},
 		});
 
-		console.log("Tester Operator created", testerDoctor);
+		console.log("Tester Operator created", testerOperator);
 	} catch (error) {
 		await prisma.user.delete({
 			where: { email: config.tester_operator_email },

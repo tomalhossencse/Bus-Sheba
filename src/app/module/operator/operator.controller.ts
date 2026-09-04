@@ -24,7 +24,7 @@ const applyAsOperator = catchAsync(async (req: Request, res: Response) => {
 		additionalDocuments,
 	);
 	sendResponse(res, {
-		statusCode: httpStatus.OK,
+		statusCode: httpStatus.CREATED,
 		success: true,
 		message: "Apply for operator successfully",
 		data: result,
