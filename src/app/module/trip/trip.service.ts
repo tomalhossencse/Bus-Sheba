@@ -23,6 +23,7 @@ const createTrip = async (payload: CreateTripPayload, user: RequestUser) => {
 
 	const bus = await prisma.bus.findFirst({
 		where: { id: payload.busId },
+		include: { seats: true },
 	});
 
 	if (!bus) {
@@ -64,6 +65,16 @@ const createTrip = async (payload: CreateTripPayload, user: RequestUser) => {
 			arrivalTime: payload.arrivalTime,
 			departureTime: payload.departureTime,
 			fare: payload.fare,
+			tripSeats: {
+				createMany: {
+					data: bus.seats.map((seat) => ({
+						seatId: seat.id,
+					})),
+				},
+			},
+		},
+		include: {
+			tripSeats: true,
 		},
 	});
 
