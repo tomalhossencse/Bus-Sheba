@@ -3,7 +3,9 @@ model Ticket {
 
     bookingId String @unique @db.Uuid
 
-    ticketNumber String @unique @db.VarChar(30)
+    ticketNumber String @unique @db.VarChar(50)
+
+    ticketPdfUrl String? @db.VarChar(255)
 
     qrCode String? @unique @db.VarChar(255)
 

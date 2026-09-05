@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>BUS SHEBA - Booking Confirmation</title>
+
+    <style>
+        /* Base reset */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #334155;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 0;
+        }
+
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f1f5f9;
+            padding: 30px 0;
+        }
+
+        .main-card {
+            max-width: 620px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+        }
+
+        /* Header Accent */
+        .brand-header {
+            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            color: #ffffff;
+            padding: 32px 28px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .brand-tagline {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: #ccfbf1;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        /* Success Banner */
+        .status-banner {
+            text-align: center;
+            padding-bottom: 24px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .badge-success {
+            display: inline-block;
+            background-color: #dcfce7;
+            color: #15803d;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+
+        .status-title {
+            margin: 0;
+            color: #0f172a;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .status-subtitle {
+            margin: 6px 0 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Sections */
+        .section-box {
+            margin-top: 24px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background-color: #f8fafc;
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f766e;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section-body {
+            padding: 16px 18px;
+        }
+
+        /* Data Rows */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .data-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .data-value {
+            color: #0f172a;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Passenger Item */
+        .passenger-card {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .passenger-card:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .passenger-card:first-child {
+            padding-top: 0;
+        }
+
+        .passenger-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f766e;
+            margin-bottom: 8px;
+        }
+
+        /* Route Display Highlight */
+        .route-badge {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            margin: 8px 0 16px;
+        }
+
+        .route-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        /* Total Highlight */
+        .total-row {
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 16px;
+        }
+
+        .total-price {
+            color: #0f766e;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        /* Action CTA */
+        .cta-wrapper {
+            text-align: center;
+            margin: 32px 0 16px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #0f766e;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        /* QR Note */
+        .qr-card {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 24px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .qr-card p {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #f8fafc;
+            padding: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer p {
+            margin: 4px 0;
+        }
+
+        /* Responsive overrides */
+        @media only screen and (max-width: 600px) {
+            .wrapper {
+                padding: 10px 0;
+            }
+            .main-card {
+                border-radius: 0;
+            }
+            .content {
+                padding: 20px 16px;
+            }
+            .brand-header {
+                padding: 24px 16px;
+            }
+            .data-row {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 4px 0;
+            }
+            .data-value {
+                text-align: left;
+                margin-top: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+    <div class="main-card">
+
+        <!-- Header -->
+        <div class="brand-header">
+            <h1 class="brand-logo">BUS SHEBA</h1>
+            <p class="brand-tagline">Premium Travel Experience</p>
+        </div>
+
+        <div class="content">
+
+            <!-- Confirmation Banner -->
+            <div class="status-banner">
+                <span class="badge-success">Confirmed</span>
+                <h2 class="status-title">Booking Successful!</h2>
+                <p class="status-subtitle">Thank you for booking with us. Here are your journey details.</p>
+            </div>
+
+            <!-- Booking Overview -->
+            <div class="section-box">
+                <div class="section-header">Ticket & Booking Info</div>
+                <div class="section-body">
+                    <div class="data-row">
+                        <span class="data-label">Ticket No:</span>
+                        <span class="data-value" style="font-family: monospace; font-size: 15px;"><%= ticket.ticketNumber.slice(0, 8).toUpperCase() %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Booking No:</span>
+                        <span class="data-value"><%= booking.bookingNumber %></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Journey Information -->
+            <div class="section-box">
+                <div class="section-header">Journey Details</div>
+                <div class="section-body">
+
+                    <!-- Visual Route -->
+                    <div class="route-badge">
+                        <span class="route-text">
+                            <%= booking.trip.route.source %> &nbsp;→&nbsp; <%= booking.trip.route.destination %>
+                        </span>
+                    </div>
+
+                    <div class="data-row">
+                        <span class="data-label">Operator:</span>
+                        <span class="data-value"><%= booking.trip.bus.operator.companyName %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Bus Name & Registration:</span>
+                        <span class="data-value"><%= booking.trip.bus.name %> (<%= booking.trip.bus.registrationNo %>)</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Travel Date:</span>
+                        <span class="data-value"><%= new Date(booking.trip.travelDate).toDateString() %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Departure Time:</span>
+                        <span class="data-value"><%= new Date(booking.trip.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Boarding Point:</span>
+                        <span class="data-value"><%= booking.fromStop.stopName %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Dropping Point:</span>
+                        <span class="data-value"><%= booking.toStop.stopName %></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passenger Details -->
+            <div class="section-box">
+                <div class="section-header">Passenger Details</div>
+                <div class="section-body">
+                    <% booking.passengers.forEach((passenger, index) => { %>
+                        <% const bookingSeat = bookingSeats[index]; %>
+                        <div class="passenger-card">
+                            <div class="passenger-title">Passenger <%= index + 1 %></div>
+                            <div class="data-row">
+                                <span class="data-label">Name:</span>
+                                <span class="data-value"><%= passenger.name %></span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Phone:</span>
+                                <span class="data-value"><%= passenger.phone %></span>
+                            </div>
+                            <% if (passenger.email) { %>
+                                <div class="data-row">
+                                    <span class="data-label">Email:</span>
+                                    <span class="data-value"><%= passenger.email %></span>
+                                </div>
+                            <% } %>
+                            <% if (bookingSeat) { %>
+                                <div class="data-row">
+                                    <span class="data-label">Seat Assigned:</span>
+                                    <span class="data-value">
+                                        <strong style="color: #0f766e;"><%= bookingSeat.tripSeat.seat.seatNumber %></strong>
+                                        (<%= bookingSeat.price %> BDT)
+                                    </span>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="section-box">
+                <div class="section-header">Payment Summary</div>
+                <div class="section-body">
+                    <div class="data-row">
+                        <span class="data-label">Payment Provider:</span>
+                        <span class="data-value"><%= payment.provider %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Transaction ID:</span>
+                        <span class="data-value" style="font-family: monospace;"><%= payment.trxID %></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Status:</span>
+                        <span class="data-value" style="color: #16a34a; text-transform: uppercase; font-size: 12px;"><%= payment.status %></span>
+                    </div>
+                    <% if (payment.paidAt) { %>
+                        <div class="data-row">
+                            <span class="data-label">Paid At:</span>
+                            <span class="data-value"><%= new Date(payment.paidAt).toLocaleString() %></span>
+                        </div>
+                    <% } %>
+                    <div class="data-row total-row">
+                        <span class="data-label" style="color: #0f172a; font-weight: 700;">Total Amount Paid:</span>
+                        <span class="data-value total-price"><%= booking.totalAmount %> BDT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Button -->
+            <div class="cta-wrapper">
+                <a href="<%= ticketPdfUrl %>" class="btn-primary" target="_blank">
+                    Download E-Ticket (PDF)
+                </a>
+            </div>
+
+            <!-- Boarding Info -->
+            <div class="qr-card">
+                <strong style="color: #334155; font-size: 13px;">Boarding Verification</strong>
+                <p>Please present your e-ticket or show the QR code from the downloaded PDF ticket when boarding.</p>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Please keep this confirmation email for your reference.</p>
+            <p>Need help? Contact support@bussheba.com</p>
+            <p style="margin-top: 10px;">© <%= new Date().getFullYear() %> BUS SHEBA. All rights reserved.</p>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
