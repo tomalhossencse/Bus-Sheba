@@ -1,445 +1,634 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>BUS SHEBA - Booking Confirmation</title>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="x-apple-disable-message-reformatting" />
 
-    <style>
-        /* Base reset */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f1f5f9;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #334155;
-            -webkit-font-smoothing: antialiased;
-            line-height: 1.5;
-        }
+        <title>BUS SHEBA - Ticket Confirmation</title>
 
-        table {
-            border-spacing: 0;
-            border-collapse: collapse;
-        }
-
-        td {
-            padding: 0;
-        }
-
-        .wrapper {
-            width: 100%;
-            table-layout: fixed;
-            background-color: #f1f5f9;
-            padding: 30px 0;
-        }
-
-        .main-card {
-            max-width: 620px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-        }
-
-        /* Header Accent */
-        .brand-header {
-            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
-            color: #ffffff;
-            padding: 32px 28px;
-            text-align: center;
-        }
-
-        .brand-logo {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .brand-tagline {
-            margin: 4px 0 0;
-            font-size: 13px;
-            color: #ccfbf1;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .content {
-            padding: 32px;
-        }
-
-        /* Success Banner */
-        .status-banner {
-            text-align: center;
-            padding-bottom: 24px;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-
-        .badge-success {
-            display: inline-block;
-            background-color: #dcfce7;
-            color: #15803d;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 9999px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 12px;
-        }
-
-        .status-title {
-            margin: 0;
-            color: #0f172a;
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .status-subtitle {
-            margin: 6px 0 0;
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* Sections */
-        .section-box {
-            margin-top: 24px;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .section-header {
-            background-color: #f8fafc;
-            padding: 12px 18px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #0f766e;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .section-body {
-            padding: 16px 18px;
-        }
-
-        /* Data Rows */
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            font-size: 14px;
-        }
-
-        .data-label {
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .data-value {
-            color: #0f172a;
-            font-weight: 600;
-            text-align: right;
-        }
-
-        /* Passenger Item */
-        .passenger-card {
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .passenger-card:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .passenger-card:first-child {
-            padding-top: 0;
-        }
-
-        .passenger-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0f766e;
-            margin-bottom: 8px;
-        }
-
-        /* Route Display Highlight */
-        .route-badge {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            margin: 8px 0 16px;
-        }
-
-        .route-text {
-            font-size: 16px;
-            font-weight: 700;
-            color: #166534;
-        }
-
-        /* Total Highlight */
-        .total-row {
-            margin-top: 8px;
-            padding-top: 10px;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 16px;
-        }
-
-        .total-price {
-            color: #0f766e;
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        /* Action CTA */
-        .cta-wrapper {
-            text-align: center;
-            margin: 32px 0 16px;
-        }
-
-        .btn-primary {
-            display: inline-block;
-            padding: 14px 32px;
-            background-color: #0f766e;
-            color: #ffffff !important;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 15px;
-            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
-            transition: all 0.2s ease;
-        }
-
-        /* QR Note */
-        .qr-card {
-            background-color: #f8fafc;
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
-            margin-top: 24px;
-            border: 1px dashed #cbd5e1;
-        }
-
-        .qr-card p {
-            margin: 4px 0 0;
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        /* Footer */
-        .footer {
-            background-color: #f8fafc;
-            padding: 24px;
-            text-align: center;
-            font-size: 12px;
-            color: #94a3b8;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .footer p {
-            margin: 4px 0;
-        }
-
-        /* Responsive overrides */
-        @media only screen and (max-width: 600px) {
-            .wrapper {
-                padding: 10px 0;
+        <style>
+            * {
+                box-sizing: border-box;
             }
-            .main-card {
-                border-radius: 0;
+
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                background-color: #f1f5f9;
+                font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                -webkit-font-smoothing: antialiased;
             }
-            .content {
-                padding: 20px 16px;
+
+            table {
+                border-spacing: 0;
+                border-collapse: collapse;
             }
-            .brand-header {
-                padding: 24px 16px;
+
+            img {
+                border: 0;
+                max-width: 100%;
+                height: auto;
             }
-            .data-row {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 4px 0;
+
+            @media only screen and (max-width: 640px) {
+                .email-wrapper {
+                    padding: 20px 10px !important;
+                }
+
+                .email-container {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    border-radius: 16px !important;
+                }
+
+                .header {
+                    padding: 32px 20px 30px !important;
+                }
+
+                .header-title {
+                    font-size: 24px !important;
+                }
+
+                .header-subtitle {
+                    font-size: 14px !important;
+                }
+
+                .header-icon {
+                    width: 58px !important;
+                    height: 58px !important;
+                    line-height: 58px !important;
+                    font-size: 28px !important;
+                }
+
+                .content {
+                    padding: 30px 20px !important;
+                }
+
+                .content-title {
+                    font-size: 22px !important;
+                }
+
+                .content-text {
+                    font-size: 15px !important;
+                    line-height: 1.7 !important;
+                }
+
+                .card {
+                    padding: 20px 16px !important;
+                }
+
+                .footer {
+                    padding: 22px 16px !important;
+                }
             }
-            .data-value {
-                text-align: left;
-                margin-top: 2px;
+
+            @media only screen and (max-width: 400px) {
+                .email-wrapper {
+                    padding: 10px 5px !important;
+                }
+
+                .email-container {
+                    border-radius: 12px !important;
+                }
+
+                .header {
+                    padding: 28px 16px !important;
+                }
+
+                .header-title {
+                    font-size: 21px !important;
+                }
+
+                .content {
+                    padding: 25px 16px !important;
+                }
+
+                .content-title {
+                    font-size: 20px !important;
+                }
+
+                .content-text {
+                    font-size: 14px !important;
+                }
+
+                .card {
+                    padding: 18px 14px !important;
+                }
             }
-        }
-    </style>
-</head>
+        </style>
+    </head>
 
-<body>
-
-<div class="wrapper">
-    <div class="main-card">
-
-        <!-- Header -->
-        <div class="brand-header">
-            <h1 class="brand-logo">BUS SHEBA</h1>
-            <p class="brand-tagline">Premium Travel Experience</p>
-        </div>
-
-        <div class="content">
-
-            <!-- Confirmation Banner -->
-            <div class="status-banner">
-                <span class="badge-success">Confirmed</span>
-                <h2 class="status-title">Booking Successful!</h2>
-                <p class="status-subtitle">Thank you for booking with us. Here are your journey details.</p>
-            </div>
-
-            <!-- Booking Overview -->
-            <div class="section-box">
-                <div class="section-header">Ticket & Booking Info</div>
-                <div class="section-body">
-                    <div class="data-row">
-                        <span class="data-label">Ticket No:</span>
-                        <span class="data-value" style="font-family: monospace; font-size: 15px;"><%= ticket.ticketNumber.slice(0, 8).toUpperCase() %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Booking No:</span>
-                        <span class="data-value"><%= booking.bookingNumber %></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Journey Information -->
-            <div class="section-box">
-                <div class="section-header">Journey Details</div>
-                <div class="section-body">
-
-                    <!-- Visual Route -->
-                    <div class="route-badge">
-                        <span class="route-text">
-                            <%= booking.trip.route.source %> &nbsp;→&nbsp; <%= booking.trip.route.destination %>
-                        </span>
-                    </div>
-
-                    <div class="data-row">
-                        <span class="data-label">Operator:</span>
-                        <span class="data-value"><%= booking.trip.bus.operator.companyName %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Bus Name & Registration:</span>
-                        <span class="data-value"><%= booking.trip.bus.name %> (<%= booking.trip.bus.registrationNo %>)</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Travel Date:</span>
-                        <span class="data-value"><%= new Date(booking.trip.travelDate).toDateString() %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Departure Time:</span>
-                        <span class="data-value"><%= new Date(booking.trip.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Boarding Point:</span>
-                        <span class="data-value"><%= booking.fromStop.stopName %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Dropping Point:</span>
-                        <span class="data-value"><%= booking.toStop.stopName %></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Passenger Details -->
-            <div class="section-box">
-                <div class="section-header">Passenger Details</div>
-                <div class="section-body">
-                    <% booking.passengers.forEach((passenger, index) => { %>
-                        <% const bookingSeat = bookingSeats[index]; %>
-                        <div class="passenger-card">
-                            <div class="passenger-title">Passenger <%= index + 1 %></div>
-                            <div class="data-row">
-                                <span class="data-label">Name:</span>
-                                <span class="data-value"><%= passenger.name %></span>
-                            </div>
-                            <div class="data-row">
-                                <span class="data-label">Phone:</span>
-                                <span class="data-value"><%= passenger.phone %></span>
-                            </div>
-                            <% if (passenger.email) { %>
-                                <div class="data-row">
-                                    <span class="data-label">Email:</span>
-                                    <span class="data-value"><%= passenger.email %></span>
+    <body>
+        <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="width: 100%; background-color: #f1f5f9"
+        >
+            <tr>
+                <td
+                    class="email-wrapper"
+                    align="center"
+                    style="padding: 40px 15px"
+                >
+                    <!-- Main Container -->
+                    <table
+                        role="presentation"
+                        class="email-container"
+                        width="620"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="
+                            width: 100%;
+                            max-width: 620px;
+                            background-color: #ffffff;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 20px;
+                            overflow: hidden;
+                            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
+                        "
+                    >
+                        <!-- Header -->
+                        <tr>
+                            <td
+                                class="header"
+                                align="center"
+                                style="
+                                    padding: 42px 30px 38px;
+                                    background-color: #0f766e;
+                                    background-image: linear-gradient(
+                                        135deg,
+                                        #0f766e 0%,
+                                        #0891b2 50%,
+                                        #2563eb 100%
+                                    );
+                                    color: #ffffff;
+                                "
+                            >
+                                <div
+                                    class="header-icon"
+                                    style="
+                                        width: 64px;
+                                        height: 64px;
+                                        line-height: 64px;
+                                        margin: 0 auto 18px;
+                                        background-color: rgba(255, 255, 255, 0.18);
+                                        border: 2px solid rgba(255, 255, 255, 0.4);
+                                        border-radius: 18px;
+                                        font-size: 30px;
+                                        font-weight: bold;
+                                        color: #ffffff;
+                                    "
+                                >
+                                    🎫
                                 </div>
-                            <% } %>
-                            <% if (bookingSeat) { %>
-                                <div class="data-row">
-                                    <span class="data-label">Seat Assigned:</span>
-                                    <span class="data-value">
-                                        <strong style="color: #0f766e;"><%= bookingSeat.tripSeat.seat.seatNumber %></strong>
-                                        (<%= bookingSeat.price %> BDT)
-                                    </span>
+
+                                <h1
+                                    class="header-title"
+                                    style="
+                                        margin: 0;
+                                        font-size: 28px;
+                                        line-height: 1.3;
+                                        font-weight: 700;
+                                        color: #ffffff;
+                                    "
+                                >
+                                    BUS SHEBA
+                                </h1>
+
+                                <p
+                                    class="header-subtitle"
+                                    style="
+                                        margin: 8px 0 0;
+                                        font-size: 15px;
+                                        line-height: 1.6;
+                                        color: rgba(255, 255, 255, 0.9);
+                                    "
+                                >
+                                    Bus Ticket Booking Platform
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!-- Content Body -->
+                        <tr>
+                            <td class="content" style="padding: 42px 42px 35px; color: #334155">
+
+                                <!-- Success Banner -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 28px;
+                                        background-color: #ecfdf5;
+                                        background-image: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 100%);
+                                        border: 1px solid #a7f3d0;
+                                        border-radius: 16px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" align="center" style="padding: 24px 20px">
+                                            <div
+                                                style="
+                                                    width: 48px;
+                                                    height: 48px;
+                                                    line-height: 48px;
+                                                    margin: 0 auto 12px;
+                                                    background-color: #059669;
+                                                    border-radius: 50%;
+                                                    color: #ffffff;
+                                                    font-size: 24px;
+                                                    font-weight: bold;
+                                                "
+                                            >
+                                                ✓
+                                            </div>
+
+                                            <h2
+                                                style="
+                                                    margin: 0 0 6px;
+                                                    font-size: 20px;
+                                                    line-height: 1.4;
+                                                    color: #047857;
+                                                    font-weight: 700;
+                                                "
+                                            >
+                                                Booking Confirmed 🎉
+                                            </h2>
+
+                                            <p
+                                                class="content-text"
+                                                style="
+                                                    margin: 0;
+                                                    font-size: 14px;
+                                                    line-height: 1.6;
+                                                    color: #065f46;
+                                                "
+                                            >
+                                                Your bus ticket has been successfully booked.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Ticket & Booking Information -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 24px;
+                                        background-color: #f8fafc;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 14px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" style="padding: 22px">
+                                            <h3 style="margin: 0 0 14px; font-size: 16px; color: #0f172a; font-weight: 700;">
+                                                Ticket Information
+                                            </h3>
+                                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                <tr>
+                                                    <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Ticket Number:</td>
+                                                    <td align="right" style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                        <%= ticket.ticketNumber.slice(0, 8) %>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Booking Number:</td>
+                                                    <td align="right" style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                        <%= booking.bookingNumber %>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Passenger Information -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 24px;
+                                        background-color: #f8fafc;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 14px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" style="padding: 22px">
+                                            <h3 style="margin: 0 0 16px; font-size: 16px; color: #0f172a; font-weight: 700;">
+                                                Passenger Information
+                                            </h3>
+
+                                            <% booking.passengers.forEach((passenger, index) => { %>
+                                                <div style="<%= index > 0 ? 'margin-top: 18px; padding-top: 18px; border-top: 1px dashed #cbd5e1;' : '' %>">
+                                                    <div style="font-size: 14px; font-weight: 700; color: #0f766e; margin-bottom: 8px;">
+                                                        Passenger <%= index + 1 %>
+                                                    </div>
+                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                        <tr>
+                                                            <td style="padding: 4px 0; font-size: 14px; color: #64748b;">Name:</td>
+                                                            <td align="right" style="padding: 4px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= passenger.name %></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 4px 0; font-size: 14px; color: #64748b;">Phone:</td>
+                                                            <td align="right" style="padding: 4px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= passenger.phone %></td>
+                                                        </tr>
+                                                        <% if (passenger.email) { %>
+                                                            <tr>
+                                                                <td style="padding: 4px 0; font-size: 14px; color: #64748b;">Email:</td>
+                                                                <td align="right" style="padding: 4px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= passenger.email %></td>
+                                                            </tr>
+                                                        <% } %>
+                                                        <% const bookingSeat = bookingSeats[index]; %>
+                                                        <% if (bookingSeat) { %>
+                                                            <tr>
+                                                                <td style="padding: 4px 0; font-size: 14px; color: #64748b;">Seat:</td>
+                                                                <td align="right" style="padding: 4px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= bookingSeat.tripSeat.seat.seatNumber %></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding: 4px 0; font-size: 14px; color: #64748b;">Seat Price:</td>
+                                                                <td align="right" style="padding: 4px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= bookingSeat.price %> BDT</td>
+                                                            </tr>
+                                                        <% } %>
+                                                    </table>
+                                                </div>
+                                            <% }); %>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Journey Information -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 24px;
+                                        background-color: #f8fafc;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 14px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" style="padding: 22px">
+                                            <h3 style="margin: 0 0 14px; font-size: 16px; color: #0f172a; font-weight: 700;">
+                                                Journey Information
+                                            </h3>
+                                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Bus:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= booking.trip.bus.name %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Registration No:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= booking.trip.bus.registrationNo %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Operator:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= booking.trip.bus.operator.companyName %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Route:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                        <%= booking.trip.route.source %> → <%= booking.trip.route.destination %>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Boarding Point:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= booking.fromStop.stopName %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Destination:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= booking.toStop.stopName %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Travel Date:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= new Date(booking.trip.travelDate).toDateString() %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Departure Time:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= new Date(booking.trip.departureTime).toLocaleTimeString() %></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Seat Breakdown Summary -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 24px;
+                                        background-color: #f8fafc;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 14px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" style="padding: 22px">
+                                            <h3 style="margin: 0 0 14px; font-size: 16px; color: #0f172a; font-weight: 700;">
+                                                Seat Information
+                                            </h3>
+                                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                <% bookingSeats.forEach((bookingSeat, index) => { %>
+                                                    <tr>
+                                                        <td style="padding: 5px 0; font-size: 14px; color: #64748b;">
+                                                            Seat <%= index + 1 %> (<%= bookingSeat.tripSeat.seat.seatNumber %>)
+                                                        </td>
+                                                        <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                            <%= bookingSeat.price %> BDT
+                                                        </td>
+                                                    </tr>
+                                                <% }); %>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Payment Information -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        margin-bottom: 28px;
+                                        background-color: #f8fafc;
+                                        border: 1px solid #e2e8f0;
+                                        border-radius: 14px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" style="padding: 22px">
+                                            <h3 style="margin: 0 0 14px; font-size: 16px; color: #0f172a; font-weight: 700;">
+                                                Payment Information
+                                            </h3>
+                                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Total Amount:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 16px; font-weight: 700; color: #059669;">
+                                                        <%= booking.totalAmount %> BDT
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Payment Method:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= payment.provider %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Transaction ID:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= payment.trxID %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Payment Status:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #059669;"><%= payment.status %></td>
+                                                </tr>
+                                                <% if (payment.paidAt) { %>
+                                                    <tr>
+                                                        <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Paid At:</td>
+                                                        <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                            <%= new Date(payment.paidAt).toLocaleString() %>
+                                                        </td>
+                                                    </tr>
+                                                <% } %>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- CTA Action Button -->
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 32px 0 28px;">
+                                    <tr>
+                                        <td align="center">
+                                            <a
+                                                href="<%= ticketPdfUrl %>"
+                                                target="_blank"
+                                                style="
+                                                    display: inline-block;
+                                                    padding: 16px 36px;
+                                                    background-color: #0f766e;
+                                                    background-image: linear-gradient(135deg, #0f766e 0%, #0891b2 100%);
+                                                    color: #ffffff;
+                                                    text-decoration: none;
+                                                    border-radius: 12px;
+                                                    font-weight: 700;
+                                                    font-size: 15px;
+                                                    box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35);
+                                                "
+                                            >
+                                                View / Download Ticket
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- QR / Verification Box -->
+                                <table
+                                    role="presentation"
+                                    width="100%"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    border="0"
+                                    style="
+                                        width: 100%;
+                                        background-color: #f0f9ff;
+                                        border-left: 4px solid #0284c7;
+                                        border-radius: 8px;
+                                    "
+                                >
+                                    <tr>
+                                        <td class="card" align="center" style="padding: 20px 18px">
+                                            <p style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #0f172a;">
+                                                🔒 Ticket Verification
+                                            </p>
+                                            <p class="content-text" style="margin: 0 0 6px; font-size: 14px; line-height: 1.6; color: #475569;">
+                                                Show the QR code from your PDF ticket when boarding.
+                                            </p>
+                                            <p style="margin: 0; font-size: 13px; font-weight: 600; color: #0284c7;">
+                                                Ticket Ref: <%= ticket.ticketNumber.slice(0, 8) %>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Signature -->
+                                <div
+                                    style="
+                                        margin-top: 34px;
+                                        padding-top: 24px;
+                                        border-top: 1px solid #e2e8f0;
+                                    "
+                                >
+                                    <p
+                                        class="content-text"
+                                        style="
+                                            margin: 0;
+                                            font-size: 15px;
+                                            line-height: 1.7;
+                                            color: #475569;
+                                        "
+                                    >
+                                        Thank you for choosing <strong>BUS SHEBA</strong>.<br />
+                                        Safe travels on your journey!
+                                    </p>
                                 </div>
-                            <% } %>
-                        </div>
-                    <% }); %>
-                </div>
-            </div>
+                            </td>
+                        </tr>
 
-            <!-- Payment Summary -->
-            <div class="section-box">
-                <div class="section-header">Payment Summary</div>
-                <div class="section-body">
-                    <div class="data-row">
-                        <span class="data-label">Payment Provider:</span>
-                        <span class="data-value"><%= payment.provider %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Transaction ID:</span>
-                        <span class="data-value" style="font-family: monospace;"><%= payment.trxID %></span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Status:</span>
-                        <span class="data-value" style="color: #16a34a; text-transform: uppercase; font-size: 12px;"><%= payment.status %></span>
-                    </div>
-                    <% if (payment.paidAt) { %>
-                        <div class="data-row">
-                            <span class="data-label">Paid At:</span>
-                            <span class="data-value"><%= new Date(payment.paidAt).toLocaleString() %></span>
-                        </div>
-                    <% } %>
-                    <div class="data-row total-row">
-                        <span class="data-label" style="color: #0f172a; font-weight: 700;">Total Amount Paid:</span>
-                        <span class="data-value total-price"><%= booking.totalAmount %> BDT</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Download Button -->
-            <div class="cta-wrapper">
-                <a href="<%= ticketPdfUrl %>" class="btn-primary" target="_blank">
-                    Download E-Ticket (PDF)
-                </a>
-            </div>
-
-            <!-- Boarding Info -->
-            <div class="qr-card">
-                <strong style="color: #334155; font-size: 13px;">Boarding Verification</strong>
-                <p>Please present your e-ticket or show the QR code from the downloaded PDF ticket when boarding.</p>
-            </div>
-
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>Please keep this confirmation email for your reference.</p>
-            <p>Need help? Contact support@bussheba.com</p>
-            <p style="margin-top: 10px;">© <%= new Date().getFullYear() %> BUS SHEBA. All rights reserved.</p>
-        </div>
-
-    </div>
-</div>
-
-</body>
+                        <!-- Footer -->
+                        <tr>
+                            <td
+                                class="footer"
+                                align="center"
+                                style="
+                                    background-color: #f8fafc;
+                                    border-top: 1px solid #e2e8f0;
+                                    padding: 28px 20px;
+                                    font-size: 13px;
+                                    line-height: 1.6;
+                                    color: #64748b;
+                                "
+                            >
+                                <p style="margin: 0 0 6px;">
+                                    Please keep this email and your ticket safe.
+                                </p>
+                                <p style="margin: 0;">
+                                    © <%= new Date().getFullYear() %> BUS SHEBA. All rights reserved.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
 </html>
