@@ -1,4 +1,3 @@
-import { ro } from "zod/locales";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";

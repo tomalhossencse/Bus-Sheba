@@ -15,7 +15,11 @@ import {
 	TApplyAsOperatorPayload,
 	TApproveOperatorPayload,
 	TOperatorVerifyPayload,
+	TUpdateOperatorPayload,
 } from "./operator.validation";
+import { is } from "zod/locales";
+import { IOperatorQuery } from "./operator.interface";
+import { OperatorWhereInput } from "../../../generated/prisma/models";
 
 const applyAsOperator = async (
 	payload: TApplyAsOperatorPayload,
@@ -337,8 +341,132 @@ const approveOperator = async (
 	return updatedOperator;
 };
 
+const updateOperator = async (
+	payload: TUpdateOperatorPayload,
+	user: RequestUser,
+) => {
+	const isUserExist = await prisma.user.findUnique({
+		where: { email: user.email, role: "OPERATOR" },
+		include: {
+			operator: true,
+		},
+	});
+
+	if (!isUserExist) {
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"User with this email is not an operator",
+		);
+	}
+
+	if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
+		throw new AppError(httpStatus.NOT_FOUND, "User is deleted");
+	}
+
+	if (isUserExist.status === "BLOCKED") {
+		throw new AppError(httpStatus.FORBIDDEN, "User is blocked");
+	}
+
+	if (isUserExist.operator?.verificationStatus !== "APPROVED") {
+		throw new AppError(httpStatus.FORBIDDEN, "Operator is not approved");
+	}
+
+	const updatedOperator = await prisma.operator.update({
+		where: { userId: isUserExist.id },
+		data: {
+			contactPerson: payload.contactPerson,
+			address: payload.address,
+		},
+	});
+
+	return updatedOperator;
+};
+
+const getAllOperators = async (query: IOperatorQuery) => {
+	const limit = query.limit ? Number(query.limit) : 5;
+	const page = query.page ? Number(query.page) : 1;
+	const skip = (page - 1) * limit;
+	const sortBy = query.sortBy ? query.sortBy : "createdAt";
+	const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+	const andConditions: OperatorWhereInput[] = [{ isDeleted: false }];
+
+	// searching
+	if (query.searchTerm) {
+		andConditions.push({
+			// searching
+			OR: [
+				{
+					name: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+				{
+					email: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+				{
+					companyName: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+			],
+		});
+	}
+
+	// filtering
+	if (query.verificationStatus) {
+		andConditions.push({
+			verificationStatus: query.verificationStatus,
+		});
+	}
+
+	const operators = await prisma.operator.findMany({
+		where: {
+			AND: andConditions,
+		},
+		// pagination
+		take: limit,
+		skip: skip,
+		//sorting
+		orderBy: {
+			[sortBy]: sortOrder,
+		},
+
+		include: {
+			user: {
+				omit: {
+					password: true,
+				},
+			},
+		},
+	});
+
+	const totalOperatorCount = await prisma.operator.count({
+		where: {
+			AND: andConditions,
+		},
+	});
+
+	return {
+		data: operators,
+		meta: {
+			limit,
+			page,
+			total: totalOperatorCount,
+			totalPages: Math.ceil(totalOperatorCount / limit),
+		},
+	};
+};
+
 export const OperatorService = {
 	applyAsOperator,
 	verifyOperator,
 	approveOperator,
+	updateOperator,
+	getAllOperators,
 };

@@ -58,6 +58,23 @@ export const applyAsOperatorSchema = z.object({
 	}),
 });
 
+export const operatorUpdateSchema = z.object({
+	companyName: z
+		.string("Company name must be a string")
+		.min(1, { message: "Company name is required" })
+		.optional(),
+
+	address: z
+		.string("Address must be a string")
+		.min(1, { message: "Address is required" })
+		.optional(),
+
+	contactPerson: z
+		.string("Contact person must be a string")
+		.min(1, { message: "Contact person is required" })
+		.optional(),
+});
+
 export const operatorVerifyZodSchema = z.object({
 	email: z.email({ message: "Invalid email address" }),
 	otp: z.string().length(6, { message: "OTP must be exactly 6 characters" }),
@@ -84,3 +101,5 @@ export type TOperatorVerifyPayload = z.infer<typeof operatorVerifyZodSchema>;
 export type TApproveOperatorPayload = z.infer<
 	typeof approveOperatorValidationSchema
 >;
+
+export type TUpdateOperatorPayload = z.infer<typeof operatorUpdateSchema>;

@@ -726,6 +726,18 @@ const updateProfile = async (
 		},
 	});
 
+	if (user.role === "OPERATOR") {
+		await prisma.operator.update({
+			where: {
+				email: currentUser.email,
+			},
+			data: {
+				name: payload?.name ?? currentUser.name,
+				phone: payload?.phone ?? currentUser.phone,
+			},
+		});
+	}
+
 	if (currentUser?.imagePublicId) {
 		await cloudinary.uploader.destroy(currentUser.imagePublicId);
 	}

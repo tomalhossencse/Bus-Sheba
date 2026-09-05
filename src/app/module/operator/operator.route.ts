@@ -6,6 +6,7 @@ import {
 import {
 	applyAsOperatorSchema,
 	approveOperatorValidationSchema,
+	operatorUpdateSchema,
 	operatorVerifyZodSchema,
 } from "./operator.validation";
 import { OperatorController } from "./operator.controller";
@@ -33,9 +34,22 @@ router.post(
 
 router.patch(
 	"/approve",
-	validateRequest(approveOperatorValidationSchema),
 	auth("ADMIN", "SUPER_ADMIN"),
+	validateRequest(approveOperatorValidationSchema),
 	OperatorController.approveOperator,
+);
+
+router.put(
+	"/update",
+	auth("OPERATOR"),
+	validateRequest(operatorUpdateSchema),
+	OperatorController.updateOperator,
+);
+
+router.get(
+	"/",
+	auth("ADMIN", "SUPER_ADMIN"),
+	OperatorController.getAllOperators,
 );
 
 export const OperatorRoutes = router;

@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/complexity/useLiteralKeys: <explanation> */
-
 import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
@@ -54,8 +52,34 @@ const approveOperator = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const updateOperator = catchAsync(async (req: Request, res: Response) => {
+	const user = req.user;
+	const result = await OperatorService.updateOperator(req.body, user);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: `Operator updated successfully.`,
+		data: result,
+	});
+});
+
+const getAllOperators = catchAsync(async (req: Request, res: Response) => {
+	const query = req.query;
+	const result = await OperatorService.getAllOperators(query);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Operators retrieved successfully.",
+		data: result,
+	});
+});
+
 export const OperatorController = {
 	applyAsOperator,
 	verifyOperator,
 	approveOperator,
+	updateOperator,
+	getAllOperators,
 };
