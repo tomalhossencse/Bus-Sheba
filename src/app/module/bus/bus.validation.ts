@@ -33,4 +33,33 @@ export const addBusSchema = z.object({
 		.max(100, { message: "Bus capacity cannot exceed 100 seats" }),
 });
 
+export const updateBusSchema = z.object({
+	name: z
+		.string({ message: "Bus name is required" })
+		.trim()
+		.min(1, { message: "Bus name cannot be empty" })
+		.optional(),
+
+	busType: z
+		.enum(BusType, {
+			message: `Invalid bus type. Must be one of: ${Object.values(BusType).join(", ")}`,
+		})
+		.optional(),
+
+	seatLayout: z
+		.enum(SeatLayout, {
+			message: "Invalid seat layout type",
+		})
+		.optional(),
+
+	totalSeats: z
+		.number({ message: "Total seats must be a number" })
+		.int({ message: "Total seats must be a whole number" })
+		.min(10, { message: "Bus capacity must be at least 10 seats" })
+		.max(100, { message: "Bus capacity cannot exceed 100 seats" })
+		.optional(),
+});
+
 export type addBusPayload = z.infer<typeof addBusSchema>;
+
+export type updateBusPayload = z.infer<typeof updateBusSchema>;

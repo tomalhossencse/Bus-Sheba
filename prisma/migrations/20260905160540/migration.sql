@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "seats" ALTER COLUMN "seatNumber" SET DATA TYPE VARCHAR(30);
