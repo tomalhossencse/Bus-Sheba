@@ -226,7 +226,7 @@ const loginUser = async (payload: ILoginUserPayload) => {
 		throw new AppError(httpStatus.BAD_REQUEST, "Password change is required");
 	}
 
-	if (user.password === null && user.googlId !== null) {
+	if (user.password === null && user.googleId !== null) {
 		throw new AppError(
 			httpStatus.CONFLICT,
 			"User already registered with google account.Please try to login in with google",

@@ -33,7 +33,7 @@ export type TicketBooking = {
 	seats: {
 		id: string;
 		price: string | number;
-		tripSeats: {
+		tripSeat: {
 			seat: {
 				seatNumber: string;
 			};
@@ -61,7 +61,7 @@ export type TicketBooking = {
 
 	payment: {
 		provider: string;
-		transactionId: string | null;
+		trxID: string | null;
 		status: string;
 		paidAt: Date | null;
 	} | null;

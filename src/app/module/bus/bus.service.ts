@@ -1,5 +1,6 @@
 import { includes } from "zod";
 import { BusWhereInput } from "../../../generated/prisma/models";
+import { BusStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
@@ -90,6 +91,7 @@ const addBusWithSeatLayout = async (
 			name: payload.name,
 			registrationNo: payload.registrationNo,
 			busType: payload.busType,
+			seatLayout: payload.seatLayout ?? "TWO_BY_TWO",
 			totalSeats: payload.totalSeats,
 			operatorId: operator.id,
 			seats: {
@@ -369,6 +371,12 @@ const getAllBuses = async (query: IBusQuery) => {
 		});
 	}
 
+	if (query.status) {
+		andConditions.push({
+			status: query.status,
+		});
+	}
+
 	const buses = await prisma.bus.findMany({
 		where: {
 			AND: andConditions,
@@ -403,9 +411,145 @@ const getAllBuses = async (query: IBusQuery) => {
 	};
 };
 
+const changeBusStatus = async (
+	status: BusStatus,
+	busId: string,
+	user: RequestUser,
+) => {
+	const operator = await prisma.operator.findUnique({
+		where: { userId: user.id },
+	});
+
+	if (!operator) {
+		throw new AppError(httpStatus.NOT_FOUND, "Operator not found");
+	}
+
+	const busExists = await prisma.bus.findUnique({
+		where: { id: busId },
+	});
+
+	if (!busExists) {
+		throw new AppError(httpStatus.NOT_FOUND, "Bus not found");
+	}
+
+	if (busExists.operatorId !== operator.id) {
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You are not authorized to manage this bus",
+		);
+	}
+
+	const bus = await prisma.bus.update({
+		where: { id: busId },
+		data: {
+			status,
+			updatedAt: new Date(),
+		},
+		include: {
+			seats: {
+				where: { isDeleted: false },
+			},
+		},
+	});
+
+	return bus;
+};
+
+const getMyBuses = async (user: RequestUser) => {
+	const operator = await prisma.operator.findUnique({
+		where: { userId: user.id },
+	});
+
+	if (!operator) {
+		throw new AppError(httpStatus.NOT_FOUND, "Operator not found");
+	}
+
+	const buses = await prisma.bus.findMany({
+		where: { operatorId: operator.id },
+		orderBy: { createdAt: "desc" },
+		include: {
+			operator: true,
+			seats: {
+				where: { isDeleted: false },
+			},
+			_count: {
+				select: { trips: true },
+			},
+		},
+	});
+
+	return buses;
+};
+
+const getBusesByOperator = async (operatorId: string) => {
+	const operator = await prisma.operator.findUnique({
+		where: { id: operatorId },
+	});
+
+	if (!operator) {
+		throw new AppError(httpStatus.NOT_FOUND, "Operator not found");
+	}
+
+	const buses = await prisma.bus.findMany({
+		where: { operatorId },
+		orderBy: { createdAt: "desc" },
+		include: {
+			operator: true,
+			seats: {
+				where: { isDeleted: false },
+			},
+		},
+	});
+
+	return buses;
+};
+
+const getBusSeats = async (busId: string) => {
+	const busExists = await prisma.bus.findUnique({
+		where: { id: busId },
+	});
+
+	if (!busExists) {
+		throw new AppError(httpStatus.NOT_FOUND, "Bus not found");
+	}
+
+	const seats = await prisma.seat.findMany({
+		where: {
+			busId: busId,
+			isDeleted: false,
+		},
+		orderBy: [
+			{ rowNumber: "asc" },
+			{ columnNumber: "asc" },
+		],
+		include: {
+			tripSeats: {
+				where: {
+					trip: {
+						arrivalTime: {
+							gt: new Date(),
+						},
+					},
+				},
+			},
+		},
+	});
+
+	return seats;
+};
+
 export const BusService = {
 	addBusWithSeatLayout,
 	updateBusWithSeatLayout,
 	getBusById,
 	getAllBuses,
+	deactivateBus: (busId: string, user: RequestUser) =>
+		changeBusStatus("INACTIVE", busId, user),
+	activateBus: (busId: string, user: RequestUser) =>
+		changeBusStatus("ACTIVE", busId, user),
+	maintenanceBus: (busId: string, user: RequestUser) =>
+		changeBusStatus("MAINTENANCE", busId, user),
+	getMyBuses,
+	getBusesByOperator,
+	getBusSeats,
 };

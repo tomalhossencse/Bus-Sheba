@@ -20,8 +20,27 @@ router.put(
 	BusController.updateBusWithSeatLayout,
 );
 
+router.patch(
+	"/deactivate/:busId",
+	auth("OPERATOR"),
+	BusController.deactivateBus,
+);
+
+router.patch("/activate/:busId", auth("OPERATOR"), BusController.activateBus);
+
+router.patch(
+	"/maintenance/:busId",
+	auth("OPERATOR"),
+	BusController.maintenanceBus,
+);
+
+// private
+router.get("/my-buses", auth("OPERATOR"), BusController.getMyBuses);
+
 // public
 router.get("/", BusController.getAllBuses);
+router.get("/operator/:operatorId", BusController.getBusesByOperator);
+router.get("/:busId/seats", BusController.getBusSeats);
 router.get("/:busId", BusController.getBusById);
 
 export const BusRoutes = router;

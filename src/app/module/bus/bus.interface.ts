@@ -1,10 +1,11 @@
-import { BusType } from "../../../generated/prisma/enums";
+import { BusStatus, BusType, SeatLayout } from "../../../generated/prisma/enums";
 import { BusWhereInput } from "../../../generated/prisma/models";
 
 export interface addBusPayload {
 	name: string;
 	registrationNo: string;
 	busType: BusType;
+	seatLayout?: SeatLayout;
 	totalSeats: number;
 }
 
@@ -19,4 +20,5 @@ export interface IBusQuery extends BusWhereInput {
 	operatorEmail?: string;
 	maxSeats?: number;
 	minSeats?: number;
+	status?: BusStatus;
 }
