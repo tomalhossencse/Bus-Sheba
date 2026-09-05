@@ -123,10 +123,87 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const googleLogin = catchAsync(async (req: Request, res: Response) => {
+	const payload = req.body;
+	const { accessToken, refreshToken } = await AuthService.googleLogin(payload);
+
+	res.cookie("accessToken", accessToken, {
+		httpOnly: true,
+		secure: false,
+		sameSite: "none",
+		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
+	});
+	res.cookie("refreshToken", refreshToken, {
+		httpOnly: true,
+		secure: false,
+		sameSite: "none",
+		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+	});
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "User logged in successfully",
+		data: { accessToken, refreshToken },
+	});
+});
+
+const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+	const payload = req.body;
+	await AuthService.forgetPassword(payload);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: `OTP sent to email : ${payload.email}`,
+		data: null,
+	});
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+	const payload = req.body;
+	await AuthService.resetPassword(payload);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Password reset successfully",
+		data: null,
+	});
+});
+
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+	const payload = req.body;
+	await AuthService.changePassword(payload, req.user as RequestUser);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Password changed successfully",
+		data: null,
+	});
+});
+
+const updateProfile = catchAsync(async (req: Request, res: Response) => {
+	const result = await AuthService.updateProfile(req.body, req?.file, req.user);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Profile updated successfully",
+		data: result,
+	});
+});
+
 export const AuthController = {
 	registerPassenger,
 	verifyPassenger,
 	loginUser,
 	getMe,
 	refreshToken,
+	googleLogin,
+	forgetPassword,
+	resetPassword,
+	changePassword,
+	updateProfile,
 };

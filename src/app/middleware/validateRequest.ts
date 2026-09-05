@@ -35,7 +35,7 @@ export const validateRequestForArray = (zodSchema: ZodArray) => {
 	});
 };
 
-export const validateRequestForApplyOperator = (zodSchema: ZodObject) => {
+export const validateRequestForForm = (zodSchema: ZodObject) => {
 	return catchAsync((req: Request, res: Response, next: NextFunction) => {
 		const rawData = JSON.parse(req.body.data);
 		const payload = zodSchema.safeParse(rawData);

@@ -11,7 +11,7 @@ model User {
   role               Role         @default(PASSENGER)
   status             UserStatus   @default(ACTIVE)
 
-  googlId         String?   @unique
+  googleId        String?   @unique
   image           String?
   imagePublicId   String?
   emailVerifiedAt DateTime?

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
 	validateRequest,
-	validateRequestForApplyOperator,
+	validateRequestForForm,
 } from "../../middleware/validateRequest";
 import {
 	applyAsOperatorSchema,
@@ -21,7 +21,7 @@ router.post(
 		{ name: "tradeLicenseDocument", maxCount: 1 },
 		{ name: "additionalDocuments", maxCount: 3 },
 	]),
-	validateRequestForApplyOperator(applyAsOperatorSchema),
+	validateRequestForForm(applyAsOperatorSchema),
 	OperatorController.applyAsOperator,
 );
 

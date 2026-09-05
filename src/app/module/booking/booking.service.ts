@@ -5,6 +5,7 @@ import { AppError } from "../../utils/AppError";
 import { CreateBookingPayload } from "./booking.validation";
 import httpStatus from "http-status";
 import { generateBookingNumber } from "../../utils/generateBookingNumber";
+import { TripSeat } from "../../../generated/prisma/client";
 
 const createBooking = async (
 	payload: CreateBookingPayload,
@@ -22,10 +23,25 @@ const createBooking = async (
 
 	const trip = await prisma.trip.findUnique({
 		where: { id: tripId },
+		include: { tripSeats: true },
 	});
 
 	if (!trip) {
 		throw new AppError(httpStatus.NOT_FOUND, "Trip not found");
+	}
+
+	// Check if all selected seats belong to the trip
+
+	const invalidSeat = tripSeatIds.some(
+		(tripSeatId) =>
+			!trip.tripSeats.some((seat: TripSeat) => seat.id === tripSeatId),
+	);
+
+	if (invalidSeat) {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Some selected seats do not belong to this trip",
+		);
 	}
 
 	if (trip.status !== "SCHEDULED") {

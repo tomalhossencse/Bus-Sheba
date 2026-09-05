@@ -13,3 +13,7 @@ export interface IVerifyPassengerPayload {
 	otp: string;
 	email: string;
 }
+
+export interface IGoogleLoginPayload {
+	idToken: string;
+}
