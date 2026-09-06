@@ -3,8 +3,10 @@ import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
 import { CreateBookingPayload } from "./booking.validation";
+import { IBookingQuery } from "./booking.interface";
 import httpStatus from "http-status";
 import { generateBookingNumber } from "../../utils/generateBookingNumber";
+import { BookingWhereInput } from "../../../generated/prisma/models";
 import { TripSeat } from "../../../generated/prisma/client";
 
 const createBooking = async (
@@ -91,7 +93,10 @@ const createBooking = async (
 		});
 
 		if (updatedTripSeats.count !== tripSeatIds.length) {
-			throw new AppError(httpStatus.CONFLICT, "Some seats were just taken");
+			throw new AppError(
+				httpStatus.CONFLICT,
+				"Some selected seats are no longer available. Please try again.",
+			);
 		}
 
 		const booking = await tx.booking.create({
@@ -127,6 +132,232 @@ const createBooking = async (
 	});
 };
 
+const getAllBookings = async (query: IBookingQuery) => {
+	const limit = query.limit ? Number(query.limit) : 5;
+	const page = query.page ? Number(query.page) : 1;
+	const skip = (page - 1) * limit;
+	const sortBy = query.sortBy ? query.sortBy : "createdAt";
+	const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+	const andConditions: BookingWhereInput[] = [];
+
+	// searching
+	if (query.searchTerm) {
+		andConditions.push({
+			OR: [
+				{
+					bookingNumber: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+			],
+		});
+	}
+
+	// filtering
+	if (query.status) {
+		andConditions.push({ status: query.status });
+	}
+
+	if (query.travelDate) {
+		const startOfDay = new Date(query.travelDate);
+		startOfDay.setHours(0, 0, 0, 0);
+
+		const endOfDay = new Date(query.travelDate);
+		endOfDay.setHours(23, 59, 59, 999);
+
+		andConditions.push({
+			trip: {
+				travelDate: {
+					gte: startOfDay,
+					lte: endOfDay,
+				},
+			},
+		});
+	}
+
+	const bookings = await prisma.booking.findMany({
+		where: { AND: andConditions },
+		take: limit,
+		skip: skip,
+		orderBy: { [sortBy]: sortOrder },
+		include: {
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+				},
+			},
+			trip: {
+				include: {
+					bus: {
+						select: {
+							name: true,
+							registrationNo: true,
+							operator: { select: { companyName: true } },
+						},
+					},
+					route: { select: { source: true, destination: true } },
+				},
+			},
+			fromStop: { select: { stopName: true } },
+			toStop: { select: { stopName: true } },
+			passengers: true,
+			seats: {
+				include: {
+					tripSeat: {
+						include: {
+							seat: { select: { seatNumber: true } },
+						},
+					},
+				},
+			},
+			payment: true,
+			ticket: true,
+		},
+	});
+
+	const totalBookingCount = await prisma.booking.count({
+		where: { AND: andConditions },
+	});
+
+	return {
+		data: bookings,
+		meta: {
+			limit,
+			page,
+			total: totalBookingCount,
+			totalPages: Math.ceil(totalBookingCount / limit),
+		},
+	};
+};
+
+const getBookingById = async (bookingId: string, user: RequestUser) => {
+	const booking = await prisma.booking.findUnique({
+		where: { id: bookingId },
+		include: {
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+				},
+			},
+			trip: {
+				include: {
+					bus: {
+						select: {
+							name: true,
+							registrationNo: true,
+							operator: { select: { companyName: true } },
+						},
+					},
+					route: { select: { source: true, destination: true } },
+				},
+			},
+			fromStop: { select: { stopName: true } },
+			toStop: { select: { stopName: true } },
+			passengers: true,
+			seats: {
+				include: {
+					tripSeat: {
+						include: {
+							seat: { select: { seatNumber: true } },
+						},
+					},
+				},
+			},
+			payment: true,
+			ticket: true,
+		},
+	});
+
+	if (!booking) {
+		throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
+	}
+
+	// passengers can only view their own bookings, admins/operators can view all
+	if (user.role === "PASSENGER" && booking.userId !== user.id) {
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"Forbidden. You don't have permission to access this booking.",
+		);
+	}
+
+	return booking;
+};
+
+const getMyBookings = async (user: RequestUser, query: IBookingQuery) => {
+	const limit = query.limit ? Number(query.limit) : 5;
+	const page = query.page ? Number(query.page) : 1;
+	const skip = (page - 1) * limit;
+	const sortBy = query.sortBy ? query.sortBy : "createdAt";
+	const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+	const andConditions: BookingWhereInput[] = [{ userId: user.id }];
+
+	if (query.status) {
+		andConditions.push({ status: query.status });
+	}
+
+	const bookings = await prisma.booking.findMany({
+		where: { AND: andConditions },
+		take: limit,
+		skip: skip,
+		orderBy: { [sortBy]: sortOrder },
+		include: {
+			trip: {
+				include: {
+					bus: {
+						select: {
+							name: true,
+							registrationNo: true,
+							operator: { select: { companyName: true } },
+						},
+					},
+					route: { select: { source: true, destination: true } },
+				},
+			},
+			fromStop: { select: { stopName: true } },
+			toStop: { select: { stopName: true } },
+			passengers: true,
+			seats: {
+				include: {
+					tripSeat: {
+						include: {
+							seat: { select: { seatNumber: true } },
+						},
+					},
+				},
+			},
+			payment: true,
+			ticket: true,
+			_count: { select: { seats: true } },
+		},
+	});
+
+	const totalBookingCount = await prisma.booking.count({
+		where: { AND: andConditions },
+	});
+
+	return {
+		data: bookings,
+		meta: {
+			limit,
+			page,
+			total: totalBookingCount,
+			totalPages: Math.ceil(totalBookingCount / limit),
+		},
+	};
+};
+
 export const BookingService = {
 	createBooking,
+	getAllBookings,
+	getBookingById,
+	getMyBookings,
 };

@@ -15,4 +15,17 @@ router.post(
 
 router.get("/callback", PaymentController.paymentCallback);
 
+// passenger
+router.get("/my", auth("PASSENGER"), PaymentController.getMyPayments);
+
+// admin
+router.get("/", auth("ADMIN", "SUPER_ADMIN"), PaymentController.getAllPayments);
+
+// admin and passenger
+router.get(
+	"/:paymentId",
+	auth("PASSENGER", "ADMIN", "SUPER_ADMIN"),
+	PaymentController.getPaymentById,
+);
+
 export const PaymentRoutes = router;

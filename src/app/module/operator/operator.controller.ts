@@ -24,7 +24,7 @@ const applyAsOperator = catchAsync(async (req: Request, res: Response) => {
 	sendResponse(res, {
 		statusCode: httpStatus.CREATED,
 		success: true,
-		message: "Apply for operator successfully",
+		message: "Apply for operator successfully and Please verify your email.",
 		data: result,
 	});
 });
@@ -35,7 +35,8 @@ const verifyOperator = catchAsync(async (req: Request, res: Response) => {
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
-		message: "Operator verified successfully.",
+		message:
+			"Operator email verified successfully and please wait for admin approval.",
 		data: result,
 	});
 });

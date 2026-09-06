@@ -208,10 +208,10 @@ const loginUser = async (payload: ILoginUserPayload) => {
 
 	const user = await prisma.user.findUnique({
 		where: { email },
+		include: { operator: true },
 	});
 
 	if (!user) {
-		// throw new Error("User not found");
 		throw new AppError(httpStatus.NOT_FOUND, "User not found");
 	}
 
@@ -233,13 +233,28 @@ const loginUser = async (payload: ILoginUserPayload) => {
 		);
 	}
 
+	if (!user.emailVerified) {
+		throw new AppError(httpStatus.FORBIDDEN, "Email is not verified");
+	}
+
+	// for operator, check if the account is approved
+	if (
+		user.role === Role.OPERATOR &&
+		user.operator?.verificationStatus !== "APPROVED"
+	) {
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"Operator account is not approved yet. Please wait for approval.",
+		);
+	}
+
 	const isPasswordMatched = await bcrypt.compare(
 		password,
 		user.password as string,
 	);
 
 	if (!isPasswordMatched) {
-		throw new Error("Invalid credentials");
+		throw new AppError(httpStatus.UNAUTHORIZED, "Invalid credentials");
 	}
 
 	const jwtPayload = {
@@ -346,7 +361,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 		where: {
 			email: googleIdTokenPayload.email,
 			role: "PASSENGER",
-			googlId: googleIdTokenPayload.sub,
+			googleId: googleIdTokenPayload.sub,
 		},
 	});
 

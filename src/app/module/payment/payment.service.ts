@@ -12,6 +12,8 @@ import { transporter } from "../../lib/nodemailer";
 import { UploadApiResponse } from "cloudinary";
 import { cloudinary } from "../../lib/cloudinary";
 import { generateTicketPdf } from "../../utils/generate-ticket-pdf";
+import { IGetPaymentsQuery } from "./payment.interface";
+import { PaymentWhereInput } from "../../../generated/prisma/models";
 
 const createPayment = async (
 	payload: CreatePaymentPayload,
@@ -444,7 +446,328 @@ const paymentCallback = async (query: Record<string, any>) => {
 	};
 };
 
+// admin or super admin
+const getAllPayments = async (query: IGetPaymentsQuery) => {
+	const limit = query.limit ? Number(query.limit) : 5;
+	const page = query.page ? Number(query.page) : 1;
+	const skip = (page - 1) * limit;
+	const sortBy = query.sortBy ? query.sortBy : "createdAt";
+	const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+	const andConditions: PaymentWhereInput[] = [];
+
+	// filtering
+	if (query.bookingId) {
+		andConditions.push({
+			bookingId: query.bookingId,
+		});
+	}
+
+	if (query.amount) {
+		andConditions.push({
+			amount: Number(query.amount),
+		});
+	}
+
+	if (query.minAmount) {
+		andConditions.push({
+			amount: {
+				gte: query.minAmount,
+			},
+		});
+	}
+
+	if (query.maxAmount) {
+		andConditions.push({
+			amount: {
+				lte: query.maxAmount,
+			},
+		});
+	}
+
+	if (query.bookingId) {
+		andConditions.push({
+			bookingId: query.bookingId,
+		});
+	}
+
+	if (query.status) {
+		andConditions.push({
+			status: query.status,
+		});
+	}
+
+	const buses = await prisma.payment.findMany({
+		where: {
+			AND: andConditions,
+		},
+		// pagination
+		take: limit,
+		skip: skip,
+		//sorting
+		orderBy: {
+			[sortBy]: sortOrder,
+		},
+		include: {
+			booking: {
+				include: {
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							phone: true,
+						},
+					},
+					trip: {
+						include: {
+							bus: {
+								select: {
+									name: true,
+									registrationNo: true,
+									operator: { select: { companyName: true } },
+								},
+							},
+							route: { select: { source: true, destination: true } },
+						},
+					},
+					fromStop: { select: { stopName: true } },
+					toStop: { select: { stopName: true } },
+					passengers: true,
+					seats: {
+						include: {
+							tripSeat: {
+								include: {
+									seat: { select: { seatNumber: true } },
+								},
+							},
+						},
+					},
+					ticket: true,
+				},
+			},
+		},
+	});
+
+	const totalPaymentCount = await prisma.payment.count({
+		where: {
+			AND: andConditions,
+		},
+	});
+
+	return {
+		data: buses,
+		meta: {
+			limit,
+			page,
+			total: totalPaymentCount,
+			totalPages: Math.ceil(totalPaymentCount / limit),
+		},
+	};
+};
+
+//passenger
+const getMyPayments = async (query: IGetPaymentsQuery, user: RequestUser) => {
+	const limit = query.limit ? Number(query.limit) : 5;
+	const page = query.page ? Number(query.page) : 1;
+	const skip = (page - 1) * limit;
+	const sortBy = query.sortBy ? query.sortBy : "createdAt";
+	const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+	const userExists = await prisma.user.findUnique({
+		where: { id: user.id },
+	});
+
+	if (!userExists) {
+		throw new Error("User not found");
+	}
+
+	const andConditions: PaymentWhereInput[] = [{ booking: { userId: user.id } }];
+
+	// filtering
+	if (query.bookingId) {
+		andConditions.push({
+			bookingId: query.bookingId,
+		});
+	}
+
+	if (query.amount) {
+		andConditions.push({
+			amount: Number(query.amount),
+		});
+	}
+
+	if (query.minAmount) {
+		andConditions.push({
+			amount: {
+				gte: query.minAmount,
+			},
+		});
+	}
+
+	if (query.maxAmount) {
+		andConditions.push({
+			amount: {
+				lte: query.maxAmount,
+			},
+		});
+	}
+
+	if (query.bookingId) {
+		andConditions.push({
+			bookingId: query.bookingId,
+		});
+	}
+
+	if (query.status) {
+		andConditions.push({
+			status: query.status,
+		});
+	}
+
+	const buses = await prisma.payment.findMany({
+		where: {
+			AND: andConditions,
+		},
+		// pagination
+		take: limit,
+		skip: skip,
+		//sorting
+		orderBy: {
+			[sortBy]: sortOrder,
+		},
+		include: {
+			booking: {
+				include: {
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							phone: true,
+						},
+					},
+					trip: {
+						include: {
+							bus: {
+								select: {
+									name: true,
+									registrationNo: true,
+									operator: { select: { companyName: true } },
+								},
+							},
+							route: { select: { source: true, destination: true } },
+						},
+					},
+					fromStop: { select: { stopName: true } },
+					toStop: { select: { stopName: true } },
+					passengers: true,
+					seats: {
+						include: {
+							tripSeat: {
+								include: {
+									seat: { select: { seatNumber: true } },
+								},
+							},
+						},
+					},
+					ticket: true,
+				},
+			},
+		},
+	});
+
+	const totalPaymentCount = await prisma.payment.count({
+		where: {
+			AND: andConditions,
+		},
+	});
+
+	return {
+		data: buses,
+		meta: {
+			limit,
+			page,
+			total: totalPaymentCount,
+			totalPages: Math.ceil(totalPaymentCount / limit),
+		},
+	};
+};
+
+//admin and passenger
+const getPaymentById = async (paymentId: string, user: RequestUser) => {
+	const userExists = await prisma.user.findUnique({
+		where: { id: user.id },
+	});
+
+	if (!userExists) {
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
+	}
+
+	const payment = await prisma.payment.findUnique({
+		where: {
+			id: paymentId,
+			// passengers can only view payments of their own bookings
+			...(user.role === "PASSENGER" ? { booking: { userId: user.id } } : {}),
+		},
+		include: {
+			booking: {
+				include: {
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							phone: true,
+						},
+					},
+					trip: {
+						include: {
+							bus: {
+								select: {
+									name: true,
+									registrationNo: true,
+									operator: { select: { companyName: true } },
+								},
+							},
+							route: { select: { source: true, destination: true } },
+						},
+					},
+					fromStop: { select: { stopName: true } },
+					toStop: { select: { stopName: true } },
+					passengers: true,
+					seats: {
+						include: {
+							tripSeat: {
+								include: {
+									seat: { select: { seatNumber: true } },
+								},
+							},
+						},
+					},
+					ticket: true,
+				},
+			},
+		},
+	});
+
+	if (!payment) {
+		if (user.role === "PASSENGER") {
+			throw new AppError(
+				httpStatus.FORBIDDEN,
+				"Forbidden. You don't have permission to access this payment.",
+			);
+		}
+		throw new AppError(httpStatus.NOT_FOUND, "Payment not found");
+	}
+
+	return payment;
+};
+
 export const PaymentService = {
 	createPayment,
 	paymentCallback,
+	getMyPayments,
+	getAllPayments,
+	getPaymentById,
 };

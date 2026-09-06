@@ -209,7 +209,7 @@ const updateBusWithSeatLayout = async (
 				await tx.seat.update({
 					where: { id: seat.id },
 					data: {
-						seatNumber: `${seat.seatNumber}${timestamp.toString().slice(-2)}`,
+						seatNumber: `${seat.seatNumber}-${timestamp.toString().slice(-4)}`,
 						isDeleted: true,
 						deletedAt: new Date(),
 					},
@@ -518,10 +518,7 @@ const getBusSeats = async (busId: string) => {
 			busId: busId,
 			isDeleted: false,
 		},
-		orderBy: [
-			{ rowNumber: "asc" },
-			{ columnNumber: "asc" },
-		],
+		orderBy: [{ rowNumber: "asc" }, { columnNumber: "asc" }],
 		include: {
 			tripSeats: {
 				where: {

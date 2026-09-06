@@ -165,13 +165,7 @@ const getAvailableSeats = catchAsync(async (req: Request, res: Response) => {
 		);
 	}
 
-	const { fromStopId, toStopId } = req.query;
-
-	const result = await TripService.getAvailableSeats(
-		tripId as string,
-		fromStopId as string | undefined,
-		toStopId as string | undefined,
-	);
+	const result = await TripService.getAvailableSeats(tripId as string);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,

@@ -11,6 +11,7 @@ import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
 import { ITripQuery } from "./trip.interface";
 import { CreateTripPayload, UpdateTripPayload } from "./trip.validation";
+import { addDays, differenceInMinutes, getDate, getDay } from "date-fns";
 
 const createTrip = async (payload: CreateTripPayload, user: RequestUser) => {
 	const isUserExists = await prisma.user.findUnique({
@@ -89,6 +90,32 @@ const createTrip = async (payload: CreateTripPayload, user: RequestUser) => {
 		throw new AppError(
 			httpStatus.CONFLICT,
 			"Trip already exists for this bus or route on this date",
+		);
+	}
+
+	if (
+		getDate(payload.travelDate) !== getDate(payload.departureTime) ||
+		getDay(payload.travelDate) !== getDay(payload.departureTime)
+	) {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Travel date and departure date must be the same",
+		);
+	}
+
+	if (addDays(payload.departureTime, 1) < new Date()) {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Departure time minimum should be 1 day after the current date and time",
+		);
+	}
+
+	if (
+		route.estimatedMinutes !==
+		differenceInMinutes(payload.arrivalTime, payload.departureTime)
+	) {
+		throw new Error(
+			"Arrival time does not match the estimated travel time for this route",
 		);
 	}
 
@@ -667,11 +694,7 @@ const searchTrips = async (query: ITripQuery) => {
 	return trips;
 };
 
-const getAvailableSeats = async (
-	tripId: string,
-	fromStopId?: string,
-	toStopId?: string,
-) => {
+const getAvailableSeats = async (tripId: string) => {
 	const trip = await prisma.trip.findUnique({
 		where: { id: tripId },
 		include: {
@@ -692,7 +715,7 @@ const getAvailableSeats = async (
 		);
 	}
 
-	let availableSeats = await prisma.tripSeat.findMany({
+	const availableSeats = await prisma.tripSeat.findMany({
 		where: {
 			tripId,
 			status: "AVAILABLE",
@@ -706,76 +729,6 @@ const getAvailableSeats = async (
 			seat: true,
 		},
 	});
-
-	if (fromStopId && toStopId) {
-		const [fromStop, toStop] = await Promise.all([
-			prisma.routeStop.findFirst({
-				where: { id: fromStopId, routeId: trip.routeId },
-			}),
-			prisma.routeStop.findFirst({
-				where: { id: toStopId, routeId: trip.routeId },
-			}),
-		]);
-
-		if (!fromStop) {
-			throw new AppError(httpStatus.NOT_FOUND, "From stop not found");
-		}
-
-		if (!toStop) {
-			throw new AppError(httpStatus.NOT_FOUND, "To stop not found");
-		}
-
-		if (fromStop.stopOrder >= toStop.stopOrder) {
-			throw new AppError(
-				httpStatus.BAD_REQUEST,
-				"From stop must be before to stop",
-			);
-		}
-
-		const overlappingBookings = await prisma.bookingSeat.findMany({
-			where: {
-				booking: {
-					tripId,
-					status: { in: ["PENDING", "CONFIRMED"] },
-				},
-				tripSeat: {
-					status: { in: ["HELD", "BOOKED"] },
-				},
-			},
-			select: {
-				tripSeatId: true,
-				booking: {
-					select: {
-						fromStop: {
-							select: { stopOrder: true },
-						},
-						toStop: {
-							select: { stopOrder: true },
-						},
-					},
-				},
-			},
-		});
-
-		const segmentOverlapSeatIds = new Set<string>();
-
-		for (const bs of overlappingBookings) {
-			const bookingFromOrder = bs.booking.fromStop.stopOrder;
-			const bookingToOrder = bs.booking.toStop.stopOrder;
-
-			const overlaps =
-				bookingFromOrder < toStop.stopOrder &&
-				bookingToOrder > fromStop.stopOrder;
-
-			if (overlaps) {
-				segmentOverlapSeatIds.add(bs.tripSeatId);
-			}
-		}
-
-		availableSeats = availableSeats.filter(
-			(seat) => !segmentOverlapSeatIds.has(seat.id),
-		);
-	}
 
 	return { availableSeats, totalAvailable: availableSeats.length };
 };

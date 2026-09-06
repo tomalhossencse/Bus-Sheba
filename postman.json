@@ -1,0 +1,1445 @@
+{
+    "info": {
+        "name": "Bus Sheba API",
+        "_postman_id": "b98b047d-25c1-4e8a-9f6a-busheba.postman",
+        "description": "Complete Postman collection for the Bus Sheba backend.\n\nBase URL: `http://localhost:5000/api/v1` (change the `baseUrl` collection variable if needed).\n\nRoles: PASSENGER, OPERATOR, ADMIN, SUPER_ADMIN.\n\n### How to test\n1. Start the server (`npm run dev`).\n2. Run `Register Passenger`, then `Verify Email` (uses the OTP emailed to you). OR log in with an existing account.\n3. Login / Verify-Email automatically save the returned `accessToken` into the collection variable, and every protected request uses the `{{accessToken}}` Bearer token.\n4. For ADMIN routes use the seeded super admin / tester admin credentials. For OPERATOR routes apply as operator (multipart), verify, then have an admin approve it.\n\n### Variables\nUUID placeholders (`{{busId}}`, `{{routeId}}`, etc.) hold example UUIDs - replace them with real IDs returned by list endpoints.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        { "key": "baseUrl", "value": "http://localhost:5000/api/v1", "type": "string" },
+        { "key": "accessToken", "value": "", "type": "string" },
+        { "key": "refreshToken", "value": "", "type": "string" },
+        { "key": "busId", "value": "44444444-4444-4444-8444-444444444444", "type": "string" },
+        { "key": "operatorId", "value": "77777777-7777-4777-8777-777777777777", "type": "string" },
+        { "key": "routeId", "value": "55555555-5555-4555-8555-555555555555", "type": "string" },
+        { "key": "routeStopId", "value": "66666666-6666-4666-8666-666666666666", "type": "string" },
+        { "key": "tripId", "value": "11111111-1111-4111-8111-111111111111", "type": "string" },
+        { "key": "fromStopId", "value": "22222222-2222-4222-8222-222222222222", "type": "string" },
+        { "key": "toStopId", "value": "33333333-3333-4333-8333-333333333333", "type": "string" },
+        { "key": "tripSeatId1", "value": "88888888-8888-4888-8888-888888888888", "type": "string" },
+        { "key": "tripSeatId2", "value": "99999999-9999-4999-8999-999999999999", "type": "string" },
+        { "key": "bookingId", "value": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "type": "string" },
+        { "key": "paymentId", "value": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", "type": "string" }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "1. Register Passenger",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "register"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Rahim Uddin\",\n    \"email\": \"rahim@example.com\",\n    \"password\": \"Pass@1234\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "Public. Creates a passenger account and sends a 6-digit OTP to the email. Password needs: 8+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special character."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Verify Email (Login)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/verify-email",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "verify-email"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"rahim@example.com\",\n    \"otp\": \"123456\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"Verify email success\", function () {",
+                                        "    pm.response.to.have.status(201);",
+                                        "    const json = pm.response.json();",
+                                        "    if (json.data && json.data.accessToken) {",
+                                        "        pm.collectionVariables.set(\"accessToken\", json.data.accessToken);",
+                                        "        pm.collectionVariables.set(\"refreshToken\", json.data.refreshToken);",
+                                        "    }",
+                                        "});"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "description": "Public. OTP must be exactly 6 characters (the one emailed during registration). On success the access token is stored in the `accessToken` collection variable."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"rahim@example.com\",\n    \"password\": \"Pass@1234\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"Login success\", function () {",
+                                        "    pm.response.to.have.status(200);",
+                                        "    const json = pm.response.json();",
+                                        "    if (json.data && json.data.accessToken) {",
+                                        "        pm.collectionVariables.set(\"accessToken\", json.data.accessToken);",
+                                        "        pm.collectionVariables.set(\"refreshToken\", json.data.refreshToken);",
+                                        "    }",
+                                        "});"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "description": "Public. Works for any verified role (PASSENGER / OPERATOR / ADMIN / SUPER_ADMIN). Sets httpOnly cookies and returns tokens in the body; the test script stores the access token for subsequent requests."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Google Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/google",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "google"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"idToken\": \"GOOGLE_ID_TOKEN_HERE\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "Public. Requires a valid Google ID token."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Forget Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/forget-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "forget-password"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"rahim@example.com\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "Public. Sends a 6-digit OTP to the email for password reset."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/reset-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "reset-password"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"rahim@example.com\",\n    \"otp\": \"123456\",\n    \"newPassword\": \"NewPass@123\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "Public. OTP is exactly 6 characters; the new password follows the standard strong-password rules."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Change Password (Auth)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/change-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "change-password"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"rahim@example.com\",\n    \"oldPassword\": \"Pass@1234\",\n    \"newPassword\": \"NewPass@123\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "Any logged-in user."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Update Profile (Auth, multipart)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/update-profile",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "update-profile"]
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                { "key": "data", "value": "{\"name\":\"Rahim Uddin\",\"phone\":\"01712345678\"}", "type": "text" },
+                                { "key": "image", "type": "file", "src": "/path/to/profile.jpg" }
+                            ]
+                        },
+                        "description": "Any logged-in user. multipart/form-data: the `data` text field holds the JSON body (name/phone optional), the `image` file field is optional (JPEG/PNG/WebP, max 5MB)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Get Me (Auth)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/me",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "me"]
+                        },
+                        "description": "Any logged-in user. Returns the current user profile."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/refresh-token",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "refresh-token"]
+                        },
+                        "description": "Public. Reads the `refreshToken` httpOnly cookie (set by login/verify-email) and issues a fresh token pair."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Operator",
+            "item": [
+                {
+                    "name": "1. Apply As Operator (multipart)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/operator/apply",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["operator", "apply"]
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                { "key": "data", "value": "{\"user\":{\"name\":\"Md Karim\",\"email\":\"karim.operator@example.com\",\"password\":\"Pass@1234\"},\"operator\":{\"companyName\":\"Karim Travels\",\"phone\":\"01712345678\",\"nidNumber\":\"1234567890123\",\"tradeLicenseNo\":\"123456\",\"businessRegistrationNo\":\"KARIM-12345\",\"taxIdentificationNo\":\"123456789012\"}}", "type": "text" },
+                                { "key": "nidDocument", "type": "file", "src": "/path/to/nid.jpg" },
+                                { "key": "tradeLicenseDocument", "type": "file", "src": "/path/to/trade-license.pdf" },
+                                { "key": "additionalDocuments", "type": "file", "src": "/path/to/extra.pdf" }
+                            ]
+                        },
+                        "description": "Public. multipart/form-data: `data` text field holds JSON `{user, operator}`; file fields `nidDocument` (1), `tradeLicenseDocument` (1), `additionalDocuments` (up to 3)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Verify Operator Email",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/operator/verify-email",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["operator", "verify-email"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"karim.operator@example.com\",\n    \"otp\": \"123456\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "Public. OTP is exactly 6 characters, sent to the operator's email after applying."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Approve Operator (Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/operator/approve",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["operator", "approve"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"operatorId\": \"{{operatorId}}\",\n    \"verificationStatus\": \"APPROVED\",\n    \"rejectReason\": \"\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. `verificationStatus` is APPROVED or REJECTED. `rejectReason` optional (use when REJECTED)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Update Operator (Operator)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/operator/update",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["operator", "update"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"companyName\": \"Karim Travels Ltd\",\n    \"address\": \"Motijheel, Dhaka\",\n    \"contactPerson\": \"Md Karim\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "OPERATOR (logged-in operator updates their own profile). All fields optional."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get All Operators (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/operator?page=1&limit=5&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["operator"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "5" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Query filters: `searchTerm`, `page`, `limit`, `sortBy`, `sortOrder`."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Bus",
+            "item": [
+                {
+                    "name": "1. Add Bus (Operator)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/add",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "add"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Green Line AC Coach\",\n    \"registrationNo\": \"DHAKA-METRO-HA-11-2233\",\n    \"busType\": \"AC\",\n    \"seatLayout\": \"TWO_BY_TWO\",\n    \"totalSeats\": 40\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "OPERATOR. `busType`: AC | NON_AC | SLEEPER | SEMI_SLEEPER. `seatLayout`: TWO_BY_TWO | ONE_BY_TWO | TWO_BY_ONE (optional). `totalSeats` 10-100. `registrationNo` format: e.g. DHAKA-METRO-HA-11-2233."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Update Bus (Operator)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/update/{{busId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "update", "{{busId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Green Line AC Coach Plus\",\n    \"busType\": \"SLEEPER\",\n    \"totalSeats\": 36\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "OPERATOR. All fields optional."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Deactivate Bus (Operator)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/deactivate/{{busId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "deactivate", "{{busId}}"]
+                        },
+                        "description": "OPERATOR. Sets bus status to INACTIVE."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Activate Bus (Operator)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/activate/{{busId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "activate", "{{busId}}"]
+                        },
+                        "description": "OPERATOR. Sets bus status to ACTIVE."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Maintenance Bus (Operator)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/maintenance/{{busId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "maintenance", "{{busId}}"]
+                        },
+                        "description": "OPERATOR. Sets bus status to MAINTENANCE."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Get My Buses (Operator)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/my-buses?page=1&limit=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "my-buses"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" }
+                            ]
+                        },
+                        "description": "OPERATOR. Paginated list of the logged-in operator's buses."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get All Buses (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/bus?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "Public. Query filters: `searchTerm`, `page`, `limit`, `sortBy`, `sortOrder`, `busType`, `status` (ACTIVE|INACTIVE|MAINTENANCE), `companyName`, `operatorEmail`, `minSeats`, `maxSeats`, `totalSeats`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Get Buses By Operator (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/operator/{{operatorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "operator", "{{operatorId}}"]
+                        },
+                        "description": "Public. All buses belonging to an operator."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Get Bus Seats (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/{{busId}}/seats",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "{{busId}}", "seats"]
+                        },
+                        "description": "Public. Seat layout of a bus."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Get Bus By ID (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/bus/{{busId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["bus", "{{busId}}"]
+                        },
+                        "description": "Public. Bus details with operator, seats and upcoming trips."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Route",
+            "item": [
+                {
+                    "name": "1. Add Route (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route/add",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route", "add"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Dhaka - Chattogram\",\n    \"source\": \"Dhaka\",\n    \"destination\": \"Chattogram\",\n    \"distanceKm\": 250,\n    \"estimatedMinutes\": 330,\n    \"routeStops\": [\n        {\n            \"stopName\": \"Dhaka (Kolabagan)\",\n            \"arrivalMinutes\": 0,\n            \"departureMinutes\": 0\n        },\n        {\n            \"stopName\": \"Comilla\",\n            \"arrivalMinutes\": 120,\n            \"departureMinutes\": 135\n        },\n        {\n            \"stopName\": \"Chattogram (GEC)\",\n            \"arrivalMinutes\": 330,\n            \"departureMinutes\": 330\n        }\n    ]\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. `routeStops` optional. Note `departureMinutes` must be >= `arrivalMinutes` for every stop."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Update Route (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route/update/{{routeId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route", "update", "{{routeId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Dhaka - Chattogram Express\",\n    \"distanceKm\": 260,\n    \"estimatedMinutes\": 320\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. All fields optional."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Deactivate Route (Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route/deactivate/{{routeId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route", "deactivate", "{{routeId}}"]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Soft-deactivates the route."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Activate Route (Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route/activate/{{routeId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route", "activate", "{{routeId}}"]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Re-activates the route."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get All Routes (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/route?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "Public. Query filters: `searchTerm`, `page`, `limit`, `sortBy`, `sortOrder`, `source`, `destination`, `isActive` (true|false), `minDistance`, `maxDistance`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Search Routes (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/route/search/Dhaka/Chattogram",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route", "search", "Dhaka", "Chattogram"]
+                        },
+                        "description": "Public. Path params: `source` / `destination`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get Route By ID (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/route/{{routeId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route", "{{routeId}}"]
+                        },
+                        "description": "Public. Route details including stops."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Route Stop",
+            "item": [
+                {
+                    "name": "1. Add Route Stop (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/add",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "add"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"routeId\": \"{{routeId}}\",\n    \"stopName\": \"Feni\",\n    \"stopOrder\": 4,\n    \"arrivalMinutes\": 200,\n    \"departureMinutes\": 210\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. `stopOrder` starts at 1; `departureMinutes` must be >= `arrivalMinutes`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Add Many Route Stops (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/add-many",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "add-many"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[\n    {\n        \"routeId\": \"{{routeId}}\",\n        \"stopName\": \"Cumilla\",\n        \"stopOrder\": 2,\n        \"arrivalMinutes\": 120,\n        \"departureMinutes\": 130\n    },\n    {\n        \"routeId\": \"{{routeId}}\",\n        \"stopName\": \"Feni\",\n        \"stopOrder\": 3,\n        \"arrivalMinutes\": 200,\n        \"departureMinutes\": 210\n    }\n]",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Request body is a JSON ARRAY of the stop objects above."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Update Route Stop (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/update/{{routeStopId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "update", "{{routeStopId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"stopName\": \"Feni Bus Terminal\",\n    \"stopOrder\": 4\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. All fields optional."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Deactivate Route Stop (Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/deactivate/{{routeStopId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "deactivate", "{{routeStopId}}"]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Soft-deletes the stop."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Activate Route Stop (Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/activate/{{routeStopId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "activate", "{{routeStopId}}"]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Restores a soft-deleted stop."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Get All Stops (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop?page=1&limit=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" }
+                            ]
+                        },
+                        "description": "Public. Query filters: `page`, `limit`, `sortBy`, `sortOrder`, `routeId`, `isDeleted`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get Stops By Route (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/route/{{routeId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "route", "{{routeId}}"]
+                        },
+                        "description": "Public. Ordered stops of a route."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Get Stop By ID (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/route-stop/{{routeStopId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["route-stop", "{{routeStopId}}"]
+                        },
+                        "description": "Public. Single stop details."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Trip",
+            "item": [
+                {
+                    "name": "1. Create Trip (Operator)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/create",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "create"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"busId\": \"{{busId}}\",\n    \"routeId\": \"{{routeId}}\",\n    \"travelDate\": \"2026-12-14\",\n    \"departureTime\": \"2026-12-14T09:00:00Z\",\n    \"arrivalTime\": \"2026-12-14T14:30:00Z\",\n    \"fare\": 1200\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "OPERATOR. Dates are ISO date/time strings (coerced). `departureTime` must be in the future, `arrivalTime` after `departureTime`. `fare` 1-50000."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Update Trip (Operator)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/update/{{tripId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "update", "{{tripId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"fare\": 1350\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "OPERATOR. All fields optional; same validation rules as create."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Cancel Trip (Operator)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/cancel/{{tripId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "cancel", "{{tripId}}"]
+                        },
+                        "description": "OPERATOR. Cancels the trip."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Change Trip Status (Operator/Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/status/{{tripId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "status", "{{tripId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"BOARDING\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "OPERATOR / ADMIN / SUPER_ADMIN. `status`: SCHEDULED | BOARDING | DEPARTED | COMPLETED | CANCELLED."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get My Trips (Operator)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/my-trips?page=1&limit=10&sortBy=departureTime&sortOrder=asc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "my-trips"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "departureTime" },
+                                { "key": "sortOrder", "value": "asc" }
+                            ]
+                        },
+                        "description": "OPERATOR. Filters: `page`, `limit`, `sortBy`, `sortOrder`, `status`, `travelDate` (YYYY-MM-DD), `source`, `destination`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Search Trips (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/search?source=Dhaka&destination=Chattogram&travelDate=2026-12-14",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "search"],
+                            "query": [
+                                { "key": "source", "value": "Dhaka" },
+                                { "key": "destination", "value": "Chattogram" },
+                                { "key": "travelDate", "value": "2026-12-14" }
+                            ]
+                        },
+                        "description": "Public. `source` and `destination` are required. `travelDate` optional (YYYY-MM-DD). Returns only SCHEDULED future trips on active routes with active buses."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Get All Trips (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trip?page=1&limit=10&sortBy=departureTime&sortOrder=asc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "departureTime" },
+                                { "key": "sortOrder", "value": "asc" }
+                            ]
+                        },
+                        "description": "Public. Filters: `searchTerm`, `page`, `limit`, `sortBy`, `sortOrder`, `source`, `destination`, `travelDate`, `busType` (AC|NON_AC|SLEEPER|SEMI_SLEEPER), `status`, `minFare`, `maxFare`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Get Trip Seats (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/{{tripId}}/seats?status=AVAILABLE",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "{{tripId}}", "seats"],
+                            "query": [
+                                { "key": "status", "value": "AVAILABLE" }
+                            ]
+                        },
+                        "description": "Public. Optional `status`: AVAILABLE | HELD | BOOKED | BLOCKED."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Get Available Seats (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/{{tripId}}/available-seats?fromStopId={{fromStopId}}&toStopId={{toStopId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "{{tripId}}", "available-seats"],
+                            "query": [
+                                { "key": "fromStopId", "value": "{{fromStopId}}" },
+                                { "key": "toStopId", "value": "{{toStopId}}" }
+                            ]
+                        },
+                        "description": "Public. `fromStopId` and `toStopId` optional; when provided are used for segment-overlap seat availability. Returns `availableSeats` and `totalAvailable`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Get Trip By ID (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trip/{{tripId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["trip", "{{tripId}}"]
+                        },
+                        "description": "Public. Full trip details with bus, operator, route stops and trip seats."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Booking",
+            "item": [
+                {
+                    "name": "1. Create Booking (Passenger)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/booking/create",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["booking", "create"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"tripId\": \"{{tripId}}\",\n    \"fromStopId\": \"{{fromStopId}}\",\n    \"toStopId\": \"{{toStopId}}\",\n    \"tripSeatIds\": [\n        \"{{tripSeatId1}}\",\n        \"{{tripSeatId2}}\"\n    ],\n    \"passengers\": [\n        {\n            \"name\": \"Rahim Uddin\",\n            \"phone\": \"01712345678\",\n            \"email\": \"rahim@example.com\"\n        },\n        {\n            \"name\": \"Karim Uddin\",\n            \"phone\": \"01812345678\",\n            \"email\": \"karim@example.com\"\n        }\n    ]\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "PASSENGER. `tripSeatIds` are the TripSeat IDs (not Bus seat IDs) - get them from `available-seats`. Number of passengers must equal number of seats. Seats are HELD for 15 minutes (`expiresAt`)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Get My Bookings (Passenger)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/booking/my?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["booking", "my"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "PASSENGER. Filters: `page`, `limit`, `sortBy`, `sortOrder`, `status` (PENDING|CONFIRMED|CANCELLED|COMPLETED|EXPIRED)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get All Bookings (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/booking?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["booking"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Filters: `searchTerm` (bookingNumber), `page`, `limit`, `sortBy`, `sortOrder`, `status`, `travelDate` (YYYY-MM-DD)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Booking By ID (Passenger/Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/booking/{{bookingId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["booking", "{{bookingId}}"]
+                        },
+                        "description": "PASSENGER / ADMIN / SUPER_ADMIN. Passengers may only access their own bookings; admins see any."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Payment",
+            "item": [
+                {
+                    "name": "1. Create Payment (bKash) (Passenger)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/payment/create",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payment", "create"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"bookingId\": \"{{bookingId}}\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "description": "PASSENGER. Initializes a bKash payment for a PENDING booking owned by the user. Returns a `paymentUrl` (bKash checkout URL)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Payment Callback (bKash, public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/payment/callback?paymentID={{paymentID}}&status=success",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payment", "callback"],
+                            "query": [
+                                { "key": "paymentID", "value": "{{paymentID}}" },
+                                { "key": "status", "value": "success" }
+                            ]
+                        },
+                        "description": "Public (called by bKash). On success: confirms booking, marks seats BOOKED, creates ticket, uploads PDF, emails the user, then redirects to the frontend. Requires the `paymentID` variable (captured from the bKash redirect)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Get My Payments (Passenger)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/payment/my?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payment", "my"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "PASSENGER. Filters: `page`, `limit`, `sortBy`, `sortOrder`, `bookingId`, `status`, `minAmount`, `maxAmount`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get All Payments (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/payment?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payment"],
+                            "query": [
+                                { "key": "page", "value": "1" },
+                                { "key": "limit", "value": "10" },
+                                { "key": "sortBy", "value": "createdAt" },
+                                { "key": "sortOrder", "value": "desc" }
+                            ]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Filters: `page`, `limit`, `sortBy`, `sortOrder`, `bookingId`, `status`, `minAmount`, `maxAmount`."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Get Payment By ID (Passenger/Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/payment/{{paymentId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payment", "{{paymentId}}"]
+                        },
+                        "description": "PASSENGER / ADMIN / SUPER_ADMIN. Passengers may only access payments of their own bookings."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Analytics",
+            "item": [
+                {
+                    "name": "1. Admin Analytics (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/analytics/admin",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["analytics", "admin"]
+                        },
+                        "description": "ADMIN / SUPER_ADMIN. Platform-wide analytics."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Operator Analytics (Operator)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/analytics/operator",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["analytics", "operator"]
+                        },
+                        "description": "OPERATOR. Scoped to the logged-in operator."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Passenger Analytics (Passenger)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                { "key": "token", "value": "{{accessToken}}", "type": "string" }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/analytics/passenger",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["analytics", "passenger"]
+                        },
+                        "description": "PASSENGER. Scoped to the logged-in passenger."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
