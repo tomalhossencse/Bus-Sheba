@@ -1,18 +1,22 @@
-# Bus Sheba 🚌
+# 🚌 Bus Sheba — Next-Gen Inter-City Transit Ecosystem
 
 A production-ready **bus ticket booking system** built with **Node.js, Express, TypeScript, and PostgreSQL (Prisma)**. It powers a full online bus-booking experience: passenger registration with email OTP, operator onboarding with document verification, admin-configured routes and stops, AC/non-AC bus management, seat-aware trip booking, bKash payment, automated ticket PDF generation with QR codes, email delivery, and real-time analytics.
 
 <div align="center">
 
 [![Live](https://img.shields.io/badge/Live-Demo-38b2ac?style=for-the-badge&logo=vercel)](https://bus-sheba.vercel.app)
+[![API Docs](https://img.shields.io/badge/API-Docs-6B4EFF?style=for-the-badge&logo=postman)](https://documenter.getpostman.com/view/49691439/2sBYAxNof7)
 [![GitHub](https://img.shields.io/badge/Source-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/tomalhossencse/Bus-Sheba)
 
 </div>
 
 | | |
 |---|---|
-| 🌐 **Live URL** | https://bus-sheba.vercel.app |
-| 📦 **Source Code** | https://github.com/tomalhossencse/Bus-Sheba |
+| 🌐 **Live API** | https://bus-sheba.vercel.app |
+| 📁 **Backend Repo** | https://github.com/tomalhossencse/Bus-Sheba |
+| 📝 **API Docs** | https://documenter.getpostman.com/view/49691439/2sBYAxNof7 |
+
+> **Live frontend flow** – passengers search trips → pick seats → book → pay via bKash → get a QR-coded e-ticket by email.
 
 > **Live frontend flow** – passengers search trips → pick seats → book → pay via bKash → get a QR-coded e-ticket by email.
 
@@ -159,6 +163,15 @@ Seeds run automatically on server start (`server.ts`) creating a **SUPER_ADMIN**
 ## 🌍 Live Demo
 
 Try the deployed app: **https://bus-sheba.vercel.app**
+
+**Test Admin Credentials:**
+
+| | |
+|---|---|
+| ✅ **Admin Email** | `testeradmin@gmail.com` |
+| ✅ **Admin Password** | `Tester@dmin1` |
+
+> 📝 Full API reference: https://documenter.getpostman.com/view/49691439/2sBYAxNof7
 
 Clone the repository to run it locally:
 
