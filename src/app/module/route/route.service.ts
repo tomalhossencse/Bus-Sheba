@@ -5,6 +5,7 @@ import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
 import { AddRoutePayload, UpdateRoutePayload } from "./route.validation";
 import { IRouteQuery } from "./route.interface";
+import { AddRouteStopPayload } from "../routeStop/routeStop.validation";
 
 const addRoute = async (payload: AddRoutePayload, user: RequestUser) => {
 	const isUserExist = await prisma.user.findUnique({
@@ -36,6 +37,17 @@ const addRoute = async (payload: AddRoutePayload, user: RequestUser) => {
 			destination: payload.destination,
 			distanceKm: payload.distanceKm,
 			estimatedMinutes: payload.estimatedMinutes,
+			stops: {
+				createMany: {
+					data:
+						payload.routeStops?.map((stop, index) => ({
+							stopName: stop.stopName,
+							stopOrder: index + 1,
+							arrivalMinutes: stop.arrivalMinutes,
+							departureMinutes: stop.departureMinutes,
+						})) || [],
+				},
+			},
 		},
 		include: {
 			stops: true,
@@ -60,10 +72,18 @@ const updateRoute = async (
 
 	const routeExists = await prisma.route.findUnique({
 		where: { id: routeId },
+		include: { trips: true },
 	});
 
 	if (!routeExists) {
 		throw new AppError(httpStatus.NOT_FOUND, "Route not found");
+	}
+
+	if (routeExists.trips.length > 0) {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Cannot update route with existing trips. Please delete the trips first.",
+		);
 	}
 
 	const route = await prisma.route.update({
@@ -73,7 +93,8 @@ const updateRoute = async (
 			source: payload.source ?? routeExists.source,
 			destination: payload.destination ?? routeExists.destination,
 			distanceKm: payload.distanceKm ?? routeExists.distanceKm,
-			estimatedMinutes: payload.estimatedMinutes ?? routeExists.estimatedMinutes,
+			estimatedMinutes:
+				payload.estimatedMinutes ?? routeExists.estimatedMinutes,
 			updatedAt: new Date(),
 		},
 		include: {
@@ -95,10 +116,15 @@ const deleteRoute = async (routeId: string, user: RequestUser) => {
 
 	const routeExists = await prisma.route.findUnique({
 		where: { id: routeId },
+		include: { trips: true },
 	});
 
 	if (!routeExists) {
 		throw new AppError(httpStatus.NOT_FOUND, "Route not found");
+	}
+
+	if (!routeExists.isActive) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Route is already deactivated");
 	}
 
 	const route = await prisma.route.update({
@@ -127,6 +153,10 @@ const activateRoute = async (routeId: string, user: RequestUser) => {
 
 	if (!routeExists) {
 		throw new AppError(httpStatus.NOT_FOUND, "Route not found");
+	}
+
+	if (routeExists.isActive) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Route is already Activated");
 	}
 
 	const route = await prisma.route.update({
@@ -252,6 +282,13 @@ const getAllRoutes = async (query: IRouteQuery) => {
 			stops: {
 				where: { isDeleted: false },
 				orderBy: { stopOrder: "asc" },
+			},
+			trips: {
+				where: {
+					arrivalTime: {
+						gt: new Date(),
+					},
+				},
 			},
 			_count: {
 				select: { trips: true },

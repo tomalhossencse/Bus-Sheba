@@ -1,5 +1,29 @@
 import { z } from "zod";
 
+export const addRouteStopSchema = z
+	.object({
+		stopName: z
+			.string({ message: "Stop name is required" })
+			.trim()
+			.min(1, { message: "Stop name cannot be empty" }),
+
+		arrivalMinutes: z
+			.number({ message: "Arrival minutes must be a number" })
+			.int({ message: "Arrival minutes must be an integer" })
+			.min(0, { message: "Arrival minutes cannot be negative" }),
+
+		departureMinutes: z
+			.number({ message: "Departure minutes must be a number" })
+			.int({ message: "Departure minutes must be an integer" })
+			.min(0, { message: "Departure minutes cannot be negative" }),
+	})
+	.refine((data) => data.departureMinutes >= data.arrivalMinutes, {
+		message: "Departure minutes cannot be earlier than arrival minutes",
+		path: ["departureMinutes"],
+	});
+
+const addManyRouteStopSchema = z.array(addRouteStopSchema);
+
 export const addRouteSchema = z
 	.object({
 		name: z
@@ -25,6 +49,8 @@ export const addRouteSchema = z
 			.number({ message: "Estimated time must be a number" })
 			.int({ message: "Estimated time must be a whole number" })
 			.positive({ message: "Estimated time must be greater than 0 minutes" }),
+
+		routeStops: addManyRouteStopSchema.optional(),
 	})
 	.refine(
 		(data) => data.source.toLowerCase() !== data.destination.toLowerCase(),
