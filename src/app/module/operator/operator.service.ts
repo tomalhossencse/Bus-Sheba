@@ -17,7 +17,6 @@ import {
 	TOperatorVerifyPayload,
 	TUpdateOperatorPayload,
 } from "./operator.validation";
-import { is } from "zod/locales";
 import { IOperatorQuery } from "./operator.interface";
 import { OperatorWhereInput } from "../../../generated/prisma/models";
 

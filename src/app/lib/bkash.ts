@@ -3,6 +3,71 @@ import httpStatus from "http-status";
 import { AppError } from "../utils/AppError";
 import { radisClient } from "./redis";
 
+type RefundBkashPaymentPayload = {
+	paymentID: string;
+	trxID: string;
+	amount: string | number;
+};
+
+export const refundBkashPayment = async (
+	payment: RefundBkashPaymentPayload,
+) => {
+	try {
+		const bkashIdToken = await getBkashIdToken();
+
+		if (!bkashIdToken) {
+			throw new AppError(
+				httpStatus.BAD_GATEWAY,
+				"Bkash access token not found",
+			);
+		}
+
+		const bkashRefundPaymentRes = await fetch(
+			`${config.bkash_base_url}/tokenized/checkout/payment/refund`,
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+					authorization: bkashIdToken,
+					"x-app-key": config.bkash_app_key,
+				},
+				body: JSON.stringify({
+					paymentID: payment.paymentID,
+					trxID: payment.trxID,
+					amount: payment.amount?.toString(),
+					sku: "Bus Ticket Cancellation",
+					reason: "Trip cancelled by operator",
+				}),
+			},
+		);
+
+		if (!bkashRefundPaymentRes.ok) {
+			throw new AppError(httpStatus.BAD_GATEWAY, "bKash Refund request failed");
+		}
+
+		const bkashRefundResult = await bkashRefundPaymentRes.json();
+
+		if (bkashRefundResult.statusCode !== "0000") {
+			throw new AppError(
+				httpStatus.BAD_GATEWAY,
+				bkashRefundResult.statusMessage || "bKash Refund failed",
+			);
+		}
+
+		return bkashRefundResult;
+	} catch (error: any) {
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		throw new AppError(
+			httpStatus.INTERNAL_SERVER_ERROR,
+			error.message || "bKash Refund failed",
+		);
+	}
+};
+
 export const getBkashIdToken = async () => {
 	try {
 		const idTokenKey = "bkash:IdToken";

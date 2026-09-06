@@ -9,6 +9,7 @@ import {
 	UpdateRouteStopPayload,
 } from "./routeStop.validation";
 import { IRouteStopQuery } from "./routeStop.interface";
+import { Trip } from "../../../generated/prisma/client";
 
 const addRouteStop = async (
 	payload: AddRouteStopPayload,
@@ -269,15 +270,24 @@ const updateRouteStop = async (
 
 	const isRouteExist = (await prisma.route.findUnique({
 		where: { id: existingStop.routeId },
-	})) as { estimatedMinutes: number } | null;
+		select: { estimatedMinutes: true, trips: true },
+	})) as { estimatedMinutes: number; trips: Trip[] } | null;
 
 	if (!isRouteExist) {
 		throw new AppError(httpStatus.NOT_FOUND, "Bus Route not found");
 	}
 
+	if (isRouteExist && isRouteExist?.trips.length > 0) {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Cannot update route stop for a route that has trips associated with it.",
+		);
+	}
+
 	const newStopOrder = payload.stopOrder ?? existingStop.stopOrder;
 	const newArrival = payload.arrivalMinutes ?? existingStop.arrivalMinutes;
-	const newDeparture = payload.departureMinutes ?? existingStop.departureMinutes;
+	const newDeparture =
+		payload.departureMinutes ?? existingStop.departureMinutes;
 
 	if (newArrival === null || newDeparture === null) {
 		throw new AppError(
@@ -314,8 +324,14 @@ const updateRouteStop = async (
 		}
 	}
 
-	if (!currentMaxStop || (currentMaxStop.id === stopId && newStopOrder >= currentMaxStop.stopOrder)) {
-		if (currentMaxStop?.id !== stopId || newStopOrder > existingStop.stopOrder) {
+	if (
+		!currentMaxStop ||
+		(currentMaxStop.id === stopId && newStopOrder >= currentMaxStop.stopOrder)
+	) {
+		if (
+			currentMaxStop?.id !== stopId ||
+			newStopOrder > existingStop.stopOrder
+		) {
 			if (newArrival !== isRouteExist.estimatedMinutes) {
 				throw new AppError(
 					httpStatus.BAD_REQUEST,
@@ -474,7 +490,10 @@ const activateRouteStop = async (stopId: string, user: RequestUser) => {
 	});
 
 	if (!existingStop?.isDeleted) {
-		throw new AppError(httpStatus.NOT_FOUND, "Route stop not found or already active");
+		throw new AppError(
+			httpStatus.NOT_FOUND,
+			"Route stop not found or already active",
+		);
 	}
 
 	const stop = await prisma.routeStop.update({
