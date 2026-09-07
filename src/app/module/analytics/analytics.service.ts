@@ -3,7 +3,6 @@ import { startOfDay, subDays } from "date-fns";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
-import { ca } from "zod/locales";
 
 const buildRevenueAggregate = (where: Record<string, unknown>) =>
 	prisma.payment.aggregate({
@@ -117,20 +116,20 @@ export const getAdminAnalytics = async () => {
 			totalBookings: bookingCount,
 			activeBookings,
 			cancelledBookings,
-			totalRevenue: revenue._sum.amount ?? 0,
+			totalRevenue: Number(revenue._sum.amount) ?? 0,
 			totalPaidPayments: revenue._count,
-			totalRefunded: refundedRevenue._sum.refundAmount ?? 0,
+			totalRefunded: Number(refundedRevenue._sum.refundAmount) ?? 0,
 			totalRefundedPayments: refundedRevenue._count,
 		},
 		bookingsByStatus: bookingsByStatus.map((item) => ({
 			status: item.status,
 			count: item._count._all,
-			totalAmount: item._sum.totalAmount ?? 0,
+			totalAmount: Number(item._sum.totalAmount) ?? 0,
 		})),
 		bookingsByDay: bookingsByDay.map((item) => ({
 			date: item.createdAt,
 			count: item._count._all,
-			totalAmount: item._sum.totalAmount ?? 0,
+			totalAmount: Number(item._sum.totalAmount) ?? 0,
 		})),
 		topRoutes: topRoutesDetailed,
 		recentTrips,
@@ -275,9 +274,9 @@ export const getOperatorAnalytics = async (user: RequestUser) => {
 			totalBookings: bookingCount,
 			activeBookings,
 			cancelledBookings,
-			totalRevenue: revenue._sum.amount ?? 0,
+			totalRevenue: Number(revenue._sum.amount) ?? 0,
 			totalPaidPayments: revenue._count,
-			totalRefunded: refunded._sum.refundAmount ?? 0,
+			totalRefunded: Number(refunded._sum.refundAmount) ?? 0,
 			totalRefundedPayments: refunded._count,
 			totalSeats: totalSeatCount,
 			bookedSeats: bookedSeatCount,
@@ -286,12 +285,12 @@ export const getOperatorAnalytics = async (user: RequestUser) => {
 		bookingsByStatus: bookingsByStatus.map((item) => ({
 			status: item.status,
 			count: item._count._all,
-			totalAmount: item._sum.totalAmount ?? 0,
+			totalAmount: Number(item._sum.totalAmount) ?? 0,
 		})),
 		bookingsByDay: tripsByDay.map((item) => ({
 			date: item.createdAt,
 			count: item._count._all,
-			totalAmount: item._sum.totalAmount ?? 0,
+			totalAmount: Number(item._sum.totalAmount) ?? 0,
 		})),
 		topRoutes: topRoutesDetailed,
 		recentTrips,
@@ -404,19 +403,19 @@ export const getPassengerAnalytics = async (user: RequestUser) => {
 			totalBookings: bookingCount,
 			activeBookings,
 			cancelledBookings,
-			totalSpent: totalSpent._sum.amount ?? 0,
-			totalRefunded: totalRefunded._sum.refundAmount ?? 0,
+			totalSpent: Number(totalSpent._sum.amount) ?? 0,
+			totalRefunded: Number(totalRefunded._sum.refundAmount) ?? 0,
 			totalTripsTaken: pastTrips.length,
 		},
 		bookingsByStatus: bookingsByStatus.map((item) => ({
 			status: item.status,
 			count: item._count._all,
-			totalAmount: item._sum.totalAmount ?? 0,
+			totalAmount: Number(item._sum.totalAmount) ?? 0,
 		})),
 		bookingsByDay: bookingsByDay.map((item) => ({
 			date: item.createdAt,
 			count: item._count._all,
-			totalAmount: item._sum.totalAmount ?? 0,
+			totalAmount: Number(item._sum.totalAmount) ?? 0,
 		})),
 		upcomingTrips,
 		pastTrips: {
