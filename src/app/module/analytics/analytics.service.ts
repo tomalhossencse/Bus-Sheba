@@ -3,6 +3,7 @@ import { startOfDay, subDays } from "date-fns";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
+import { ca } from "zod/locales";
 
 const buildRevenueAggregate = (where: Record<string, unknown>) =>
 	prisma.payment.aggregate({
@@ -26,6 +27,7 @@ export const getAdminAnalytics = async () => {
 		tripCount,
 		bookingCount,
 		activeBookings,
+		cancelledBookings,
 		revenue,
 		refundedRevenue,
 		bookingsByStatus,
@@ -41,6 +43,9 @@ export const getAdminAnalytics = async () => {
 		prisma.booking.count(),
 		prisma.booking.count({
 			where: { status: { in: ["PENDING", "CONFIRMED"] } },
+		}),
+		prisma.booking.count({
+			where: { status: { in: ["CANCELLED", "EXPIRED"] } },
 		}),
 		buildRevenueAggregate({ status: "PAID" }),
 		buildRefundedAggregate({ status: "REFUNDED" }),
@@ -111,6 +116,7 @@ export const getAdminAnalytics = async () => {
 			totalTrips: tripCount,
 			totalBookings: bookingCount,
 			activeBookings,
+			cancelledBookings,
 			totalRevenue: revenue._sum.amount ?? 0,
 			totalPaidPayments: revenue._count,
 			totalRefunded: refundedRevenue._sum.refundAmount ?? 0,
@@ -151,6 +157,7 @@ export const getOperatorAnalytics = async (user: RequestUser) => {
 		tripCount,
 		bookingCount,
 		activeBookings,
+		cancelledBookings,
 		revenue,
 		refunded,
 		totalSeats,
@@ -167,6 +174,12 @@ export const getOperatorAnalytics = async (user: RequestUser) => {
 			where: {
 				...bookingWhere,
 				status: { in: ["PENDING", "CONFIRMED"] },
+			},
+		}),
+		prisma.booking.count({
+			where: {
+				...bookingWhere,
+				status: { in: ["CANCELLED", "EXPIRED"] },
 			},
 		}),
 		buildRevenueAggregate(paymentWhere as Record<string, unknown>),
@@ -261,6 +274,7 @@ export const getOperatorAnalytics = async (user: RequestUser) => {
 			totalTrips: tripCount,
 			totalBookings: bookingCount,
 			activeBookings,
+			cancelledBookings,
 			totalRevenue: revenue._sum.amount ?? 0,
 			totalPaidPayments: revenue._count,
 			totalRefunded: refunded._sum.refundAmount ?? 0,
@@ -290,6 +304,7 @@ export const getPassengerAnalytics = async (user: RequestUser) => {
 	const [
 		bookingCount,
 		activeBookings,
+		cancelledBookings,
 		totalSpent,
 		totalRefunded,
 		bookingsByStatus,
@@ -302,6 +317,12 @@ export const getPassengerAnalytics = async (user: RequestUser) => {
 			where: {
 				userId: user.id,
 				status: { in: ["PENDING", "CONFIRMED"] },
+			},
+		}),
+		prisma.booking.count({
+			where: {
+				userId: user.id,
+				status: { in: ["CANCELLED", "EXPIRED"] },
 			},
 		}),
 		prisma.payment.aggregate({
@@ -382,6 +403,7 @@ export const getPassengerAnalytics = async (user: RequestUser) => {
 		summary: {
 			totalBookings: bookingCount,
 			activeBookings,
+			cancelledBookings,
 			totalSpent: totalSpent._sum.amount ?? 0,
 			totalRefunded: totalRefunded._sum.refundAmount ?? 0,
 			totalTripsTaken: pastTrips.length,
