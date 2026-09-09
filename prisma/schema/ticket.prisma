@@ -11,6 +11,10 @@ model Ticket {
 
     issuedAt DateTime @default(now())
 
+    status TicketStatus @default(ACTIVE)
+    usedAt DateTime?
+    usedBy String?
+
     booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
 
     @@map("tickets")

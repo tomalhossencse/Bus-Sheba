@@ -18,6 +18,7 @@ import { TripRoutes } from "./app/module/trip/trip.route";
 import { BookingRoutes } from "./app/module/booking/booking.route";
 import { PaymentRoutes } from "./app/module/payment/payment.route";
 import { AnalyticsRoutes } from "./app/module/analytics/analytics.route";
+import { TicketRoutes } from "./app/module/ticket/ticket.route";
 
 const app: Application = express();
 
@@ -44,6 +45,7 @@ app.use("/api/v1/trip", TripRoutes);
 app.use("/api/v1/booking", BookingRoutes);
 app.use("/api/v1/payment", PaymentRoutes);
 app.use("/api/v1/analytics", AnalyticsRoutes);
+app.use("/api/v1/tickets", TicketRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

@@ -1,4 +1,3 @@
-import { includes } from "zod";
 import { BusWhereInput } from "../../../generated/prisma/models";
 import { BusStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
@@ -123,9 +122,16 @@ const updateBusWithSeatLayout = async (
 		where: { id: busId },
 		include: {
 			trips: true,
+			operator: { select: { userId: true } },
 		},
 	});
 
+	if (busExists?.operator.userId !== operator.userId) {
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"Forbidden. You don't have permission to update this bus.",
+		);
+	}
 	if (!busExists) {
 		throw new AppError(httpStatus.CONFLICT, "Bus with this ID does not exist");
 	}
