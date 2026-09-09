@@ -305,7 +305,7 @@ const paymentCallback = async (query: Record<string, any>) => {
 
 			const ticketNumber = generateTicketNumber(booking.id);
 
-			const qrCode = `${config.app_url}/tickets/verify/${ticketNumber}`;
+			const qrCode = `${config.backend_url}/tickets/verify/${ticketNumber}`;
 
 			const ticket = await tx.ticket.create({
 				data: {
