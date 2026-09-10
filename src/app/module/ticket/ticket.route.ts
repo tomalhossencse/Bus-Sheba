@@ -8,6 +8,12 @@ const router = Router();
 router.get("/verify/:ticketNumber", TicketController.checkTicket);
 
 // operator - callback
+router.get(
+	"/operator/:ticketNumber",
+	auth("OPERATOR"),
+	TicketController.previewOperatorTicket,
+);
+
 router.put(
 	"/verify/:ticketNumber",
 	auth("OPERATOR"),

@@ -572,8 +572,8 @@ const getAllPayments = async (query: IGetPaymentsQuery) => {
 							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true } },
-					toStop: { select: { stopName: true } },
+					fromStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
+					toStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
 					passengers: true,
 					seats: {
 						include: {
@@ -700,8 +700,8 @@ const getMyPayments = async (query: IGetPaymentsQuery, user: RequestUser) => {
 							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true } },
-					toStop: { select: { stopName: true } },
+					fromStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
+					toStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
 					passengers: true,
 					seats: {
 						include: {
@@ -774,8 +774,8 @@ const getPaymentById = async (paymentId: string, user: RequestUser) => {
 							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true } },
-					toStop: { select: { stopName: true } },
+					fromStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
+					toStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
 					passengers: true,
 					seats: {
 						include: {

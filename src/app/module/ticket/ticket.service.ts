@@ -39,9 +39,18 @@ const checkTicketCallback = async (ticketNumber: string) => {
 				},
 			},
 			passengers: true,
+			seats: {
+				include: {
+					tripSeat: {
+						include: {
+							seat: { select: { seatNumber: true } },
+						},
+					},
+				},
+			},
 			payment: true,
-			fromStop: { select: { stopName: true } },
-			toStop: { select: { stopName: true } },
+			fromStop: { select: { id: true, stopName: true, stopOrder: true, arrivalMinutes: true, departureMinutes: true } },
+			toStop: { select: { id: true, stopName: true, stopOrder: true, arrivalMinutes: true, departureMinutes: true } },
 		},
 	});
 
@@ -111,63 +120,122 @@ const verifyTicket = async (ticketNumber: string, user: RequestUser) => {
 		);
 	}
 
-	// const now = new Date()
+	if (booking.trip.status === "DEPARTED" || booking.trip.status === "COMPLETED") {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Boarding verification is closed for this trip",
+		);
+	}
 
-	// if(booking.trip.departureTime < now){
-	// 	throw new AppError(httpStatus.BAD_REQUEST , "You don't have permission")
-	// }
+	if (booking.status !== "CONFIRMED" || booking.ticket?.status !== "ACTIVE") {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Only a confirmed active ticket can be used for boarding",
+		);
+	}
 
-	const updateTicket = await prisma.ticket.update({
-		where: { bookingId },
+	if (booking.ticket?.status === "USED") {
+		throw new AppError(
+			httpStatus.CONFLICT,
+			`Ticket has already been used${booking.ticket.usedAt ? ` at ${booking.ticket.usedAt.toISOString()}` : ""}`,
+		);
+	}
+
+	const updatedTicket = await prisma.ticket.updateMany({
+		where: { bookingId, status: "ACTIVE" },
 		data: {
 			status: "USED",
 			usedAt: new Date(),
 		},
+	});
+
+	if (updatedTicket.count !== 1) {
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"Ticket was already used by another scan",
+		);
+	}
+
+	return previewOperatorTicket(ticketNumber, user);
+};
+
+const previewOperatorTicket = async (
+	ticketNumber: string,
+	user: RequestUser,
+) => {
+	const operator = await prisma.operator.findUnique({
+		where: {
+			userId: user.id,
+			user: { role: "OPERATOR" },
+		},
+	});
+
+	if (!operator) {
+		throw new AppError(httpStatus.NOT_FOUND, "Operator not found");
+	}
+
+	const ticket = await prisma.ticket.findUnique({
+		where: { ticketNumber },
 		include: {
 			booking: {
 				include: {
 					user: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-							phone: true,
-						},
+						select: { id: true, name: true, email: true, phone: true },
 					},
 					trip: {
 						include: {
 							bus: true,
-							route: {
-								select: {
-									source: true,
-									destination: true,
-								},
-							},
+							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true } },
-					toStop: { select: { stopName: true } },
+					fromStop: {
+						select: {
+							id: true,
+							stopName: true,
+							stopOrder: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
+					toStop: {
+						select: {
+							id: true,
+							stopName: true,
+							stopOrder: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
 					passengers: true,
 					seats: {
 						include: {
 							tripSeat: {
-								include: {
-									seat: { select: { seatNumber: true } },
-								},
+								include: { seat: { select: { seatNumber: true } } },
 							},
 						},
 					},
 					payment: true,
-					ticket: true,
 				},
 			},
 		},
 	});
 
-	return updateTicket;
+	if (!ticket) {
+		throw new AppError(httpStatus.NOT_FOUND, "Ticket not found");
+	}
+
+	if (ticket.booking.trip.bus.operatorId !== operator.id) {
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"This ticket belongs to another operator",
+		);
+	}
+
+	return ticket;
 };
 
 export const TicketService = {
 	checkTicketCallback,
 	verifyTicket,
+	previewOperatorTicket,
 };

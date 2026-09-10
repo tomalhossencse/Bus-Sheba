@@ -44,7 +44,30 @@ const verifyTicket = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const previewOperatorTicket = catchAsync(async (req: Request, res: Response) => {
+	const ticketNumber = req.params.ticketNumber;
+	if (!ticketNumber) {
+		throw new AppError(
+			httpStatus.NOT_FOUND,
+			"Ticket number is required in the request parameters",
+		);
+	}
+
+	const result = await TicketService.previewOperatorTicket(
+		ticketNumber,
+		req.user,
+	);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Ticket details loaded successfully",
+		data: result,
+	});
+});
+
 export const TicketController = {
 	checkTicket,
 	verifyTicket,
+	previewOperatorTicket,
 };
