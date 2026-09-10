@@ -4,9 +4,20 @@ import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
 
 const checkTicketCallback = async (ticketNumber: string) => {
-	const bookingId = ticketNumber.slice(10);
+	const ticket = await prisma.ticket.findUnique({
+		where: { ticketNumber },
+		select: { bookingId: true },
+	});
+
+	if (!ticket) {
+		throw new AppError(
+			httpStatus.NOT_FOUND,
+			"No booking found with this ticket",
+		);
+	}
+
 	const booking = await prisma.booking.findUnique({
-		where: { id: bookingId },
+		where: { id: ticket.bookingId },
 		include: {
 			ticket: true,
 			user: {
@@ -57,7 +68,19 @@ const verifyTicket = async (ticketNumber: string, user: RequestUser) => {
 		throw new AppError(httpStatus.NOT_FOUND, "Operator not found");
 	}
 
-	const bookingId = ticketNumber.slice(10);
+	const ticketRecord = await prisma.ticket.findUnique({
+		where: { ticketNumber },
+		select: { bookingId: true },
+	});
+
+	if (!ticketRecord) {
+		throw new AppError(
+			httpStatus.NOT_FOUND,
+			"No booking found with this ticket",
+		);
+	}
+
+	const bookingId = ticketRecord.bookingId;
 
 	const booking = await prisma.booking.findUnique({
 		where: { id: bookingId },
@@ -100,7 +123,45 @@ const verifyTicket = async (ticketNumber: string, user: RequestUser) => {
 			status: "USED",
 			usedAt: new Date(),
 		},
-		include: { booking: true },
+		include: {
+			booking: {
+				include: {
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							phone: true,
+						},
+					},
+					trip: {
+						include: {
+							bus: true,
+							route: {
+								select: {
+									source: true,
+									destination: true,
+								},
+							},
+						},
+					},
+					fromStop: { select: { stopName: true } },
+					toStop: { select: { stopName: true } },
+					passengers: true,
+					seats: {
+						include: {
+							tripSeat: {
+								include: {
+									seat: { select: { seatNumber: true } },
+								},
+							},
+						},
+					},
+					payment: true,
+					ticket: true,
+				},
+			},
+		},
 	});
 
 	return updateTicket;
