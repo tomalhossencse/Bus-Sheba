@@ -7,7 +7,31 @@ const checkTicketCallback = async (ticketNumber: string) => {
 	const bookingId = ticketNumber.slice(10);
 	const booking = await prisma.booking.findUnique({
 		where: { id: bookingId },
-		include: { ticket: true },
+		include: {
+			ticket: true,
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+				},
+			},
+			trip: {
+				include: {
+					route: {
+						select: {
+							source: true,
+							destination: true,
+						},
+					},
+				},
+			},
+			passengers: true,
+			payment: true,
+			fromStop: { select: { stopName: true } },
+			toStop: { select: { stopName: true } },
+		},
 	});
 
 	if (!booking) {
