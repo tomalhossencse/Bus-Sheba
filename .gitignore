@@ -14,3 +14,4 @@ pnpm-workspace.yaml
 .vscode
 
 .vercel
+.env*

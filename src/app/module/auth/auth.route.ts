@@ -4,7 +4,6 @@ import { AuthController } from "./auth.controller";
 import {
 	validateRequest,
 	validateRequestForForm,
-	validateRequestForArray,
 } from "../../middleware/validateRequest";
 import {
 	ChangePasswordZodSchema,
@@ -69,5 +68,7 @@ router.put(
 router.get("/me", auth(), AuthController.getMe);
 
 router.post("/refresh-token", AuthController.refreshToken);
+
+router.post("/logout", AuthController.logout);
 
 export const AuthRoutes = router;

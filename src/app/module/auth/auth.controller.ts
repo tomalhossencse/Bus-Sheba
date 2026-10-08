@@ -4,6 +4,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { AuthService } from "./auth.service";
 import { RequestUser } from "../../types/types";
+import { getCookieOptions } from "../../utils/cookieOptions";
 
 const registerPassenger = catchAsync(async (req: Request, res: Response) => {
 	await AuthService.registerPassenger(req.body);
@@ -22,18 +23,12 @@ const verifyPassenger = catchAsync(async (req: Request, res: Response) => {
 		req.body,
 	);
 
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
+	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
+	res.cookie(
+		"refreshToken",
+		refreshToken,
+		getCookieOptions(1000 * 60 * 60 * 24 * 7),
+	);
 
 	sendResponse(res, {
 		statusCode: httpStatus.CREATED,
@@ -52,18 +47,12 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 	const result = await AuthService.loginUser(payload);
 	const { accessToken, refreshToken } = result;
 
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
+	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
+	res.cookie(
+		"refreshToken",
+		refreshToken,
+		getCookieOptions(1000 * 60 * 60 * 24 * 7),
+	);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -99,18 +88,12 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 	const result = await AuthService.refreshToken(req.cookies.refreshToken);
 	const { accessToken, refreshToken: newRefreshToken } = result;
 
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", newRefreshToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
+	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
+	res.cookie(
+		"refreshToken",
+		newRefreshToken,
+		getCookieOptions(1000 * 60 * 60 * 24 * 7),
+	);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -127,18 +110,12 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
 	const { accessToken, refreshToken } = await AuthService.googleLogin(payload);
 
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
+	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
+	res.cookie(
+		"refreshToken",
+		refreshToken,
+		getCookieOptions(1000 * 60 * 60 * 24 * 7),
+	);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -195,6 +172,18 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const logout = catchAsync(async (req: Request, res: Response) => {
+	const baseOptions = getCookieOptions();
+	res.clearCookie("accessToken", baseOptions);
+	res.clearCookie("refreshToken", baseOptions);
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "User Logout Succesfully",
+		data: null,
+	});
+});
+
 export const AuthController = {
 	registerPassenger,
 	verifyPassenger,
@@ -206,4 +195,5 @@ export const AuthController = {
 	resetPassword,
 	changePassword,
 	updateProfile,
+	logout,
 };

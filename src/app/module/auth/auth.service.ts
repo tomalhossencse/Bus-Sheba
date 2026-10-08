@@ -20,7 +20,7 @@ import httpStatus from "http-status";
 import crypto from "crypto";
 import { radisClient } from "../../lib/redis";
 import path from "path";
-import ejs, { name } from "ejs";
+import ejs from "ejs";
 import { transporter } from "../../lib/nodemailer";
 import { RequestUser } from "../../types/types";
 import { TokenPayload } from "google-auth-library";
@@ -28,7 +28,6 @@ import { googleClient } from "../../lib/googleAuth";
 
 import { UploadApiResponse } from "cloudinary";
 import { cloudinary } from "../../lib/cloudinary";
-import { buffer } from "stream/consumers";
 const registerPassenger = async (payload: IRegisterPassengerPayload) => {
 	const { name, password } = payload;
 	const email = payload.email.trim().toLowerCase();
