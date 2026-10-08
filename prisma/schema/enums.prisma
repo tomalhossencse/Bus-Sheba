@@ -80,3 +80,8 @@ enum PaymentStatus {
   REFUNDED
   PARTIALLY_REFUNDED
 }
+
+enum TicketStatus {
+  ACTIVE
+  USED
+}

@@ -1,19 +1,19 @@
 {
     "version": 2,
-
     "builds": [
         {
             "src": "dist/server.js",
-
             "use": "@vercel/node"
         }
     ],
-
     "routes": [
         {
-            "src": "/(.*)",
-
+            "src": "/api/v1/(.*)",
             "dest": "dist/server.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "https://bus-sheba-bd.vercel.app/$1"
         }
     ]
 }

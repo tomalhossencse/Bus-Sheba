@@ -18,12 +18,26 @@ import { TripRoutes } from "./app/module/trip/trip.route";
 import { BookingRoutes } from "./app/module/booking/booking.route";
 import { PaymentRoutes } from "./app/module/payment/payment.route";
 import { AnalyticsRoutes } from "./app/module/analytics/analytics.route";
+import { TicketRoutes } from "./app/module/ticket/ticket.route";
 
 const app: Application = express();
 
+const allowedOrigins = [
+    config.frontend_url,
+    "http://localhost:3000",
+    "https://bus-sheba-bd.vercel.app",
+    "https://bus-sheba.vercel.app",
+].filter((origin): origin is string => Boolean(origin));
+
 app.use(
 	cors({
-		origin: config.frontend_url,
+		origin: (origin, callback) => {
+			if (!origin || allowedOrigins.includes(origin)) {
+				return callback(null, true);
+			}
+
+			return callback(new Error(`Origin ${origin} is not allowed by CORS`));
+		},
 		credentials: true,
 	}),
 );
@@ -44,9 +58,10 @@ app.use("/api/v1/trip", TripRoutes);
 app.use("/api/v1/booking", BookingRoutes);
 app.use("/api/v1/payment", PaymentRoutes);
 app.use("/api/v1/analytics", AnalyticsRoutes);
+app.use("/api/v1/tickets", TicketRoutes);
 
 // Basic route
-app.get("/", async (req: Request, res: Response) => {
+app.get("/health", async (req: Request, res: Response) => {
 	res.status(httpStatus.OK).json({
 		success: true,
 		message: "Welcome to Bus Sheba System Backend",

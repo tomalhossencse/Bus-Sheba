@@ -40,8 +40,27 @@ const addRoute = async (payload: AddRoutePayload, user: RequestUser) => {
 			stops: {
 				createMany: {
 					data:
-						payload.routeStops?.map((stop, index) => ({
-							stopName: stop.stopName,
+						(payload.routeStops?.length
+							? payload.routeStops
+							: [
+									{
+										stopName: payload.source,
+										arrivalMinutes: 0,
+										departureMinutes: 0,
+									},
+									{
+										stopName: payload.destination,
+										arrivalMinutes: payload.estimatedMinutes,
+										departureMinutes: payload.estimatedMinutes,
+									},
+								]
+						).map((stop, index, stops) => ({
+							stopName:
+								index === 0
+									? payload.source
+									: index === stops.length - 1
+										? payload.destination
+										: stop.stopName,
 							stopOrder: index + 1,
 							arrivalMinutes: stop.arrivalMinutes,
 							departureMinutes: stop.departureMinutes,
