@@ -6,12 +6,6 @@ import { AuthService } from "./auth.service";
 import { RequestUser } from "../../types/types";
 import { getCookieOptions } from "../../utils/cookieOptions";
 
-const authCookieOptions = {
-	httpOnly: true,
-	secure: process.env.NODE_ENV === "production",
-	sameSite: process.env.NODE_ENV === "production" ? ("none" as const) : ("lax" as const),
-};
-
 const registerPassenger = catchAsync(async (req: Request, res: Response) => {
 	await AuthService.registerPassenger(req.body);
 
@@ -29,23 +23,12 @@ const verifyPassenger = catchAsync(async (req: Request, res: Response) => {
 		req.body,
 	);
 
-<<<<<<< HEAD
 	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
 	res.cookie(
 		"refreshToken",
 		refreshToken,
 		getCookieOptions(1000 * 60 * 60 * 24 * 7),
 	);
-=======
-	res.cookie("accessToken", accessToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
->>>>>>> 84578b4c446403aa3d5026184cdf895cf08b5081
 
 	sendResponse(res, {
 		statusCode: httpStatus.CREATED,
@@ -64,23 +47,12 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 	const result = await AuthService.loginUser(payload);
 	const { accessToken, refreshToken } = result;
 
-<<<<<<< HEAD
 	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
 	res.cookie(
 		"refreshToken",
 		refreshToken,
 		getCookieOptions(1000 * 60 * 60 * 24 * 7),
 	);
-=======
-	res.cookie("accessToken", accessToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
->>>>>>> 84578b4c446403aa3d5026184cdf895cf08b5081
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -116,23 +88,12 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 	const result = await AuthService.refreshToken(req.cookies.refreshToken);
 	const { accessToken, refreshToken: newRefreshToken } = result;
 
-<<<<<<< HEAD
 	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
 	res.cookie(
 		"refreshToken",
 		newRefreshToken,
 		getCookieOptions(1000 * 60 * 60 * 24 * 7),
 	);
-=======
-	res.cookie("accessToken", accessToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", newRefreshToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
->>>>>>> 84578b4c446403aa3d5026184cdf895cf08b5081
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -149,23 +110,12 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
 	const { accessToken, refreshToken } = await AuthService.googleLogin(payload);
 
-<<<<<<< HEAD
 	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
 	res.cookie(
 		"refreshToken",
 		refreshToken,
 		getCookieOptions(1000 * 60 * 60 * 24 * 7),
 	);
-=======
-	res.cookie("accessToken", accessToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
-	});
-	res.cookie("refreshToken", refreshToken, {
-		...authCookieOptions,
-		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-	});
->>>>>>> 84578b4c446403aa3d5026184cdf895cf08b5081
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
