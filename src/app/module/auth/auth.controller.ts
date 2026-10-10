@@ -45,7 +45,7 @@ const verifyPassenger = catchAsync(async (req: Request, res: Response) => {
 const loginUser = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
 	const result = await AuthService.loginUser(payload);
-	const { accessToken, refreshToken } = result;
+	const { accessToken, refreshToken, user } = result;
 
 	res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
 	res.cookie(
@@ -61,6 +61,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 		data: {
 			accessToken,
 			refreshToken,
+			user,
 		},
 	});
 });
