@@ -73,7 +73,8 @@ const getAllOperators = catchAsync(async (req: Request, res: Response) => {
 		statusCode: httpStatus.OK,
 		success: true,
 		message: "Operators retrieved successfully.",
-		data: result,
+		data: result.data,
+		meta: result.meta,
 	});
 });
 
