@@ -23,10 +23,11 @@ import { TicketRoutes } from "./app/module/ticket/ticket.route";
 const app: Application = express();
 
 const allowedOrigins = [
-    config.frontend_url,
-    "http://localhost:3000",
-    "https://bus-sheba-bd.vercel.app",
-    "https://bus-sheba.vercel.app",
+	config.frontend_url,
+	"http://localhost:3000",
+	"https://bus-sheba-bd.vercel.app",
+	"https://bus-sheba.vercel.app",
+	"https://bd-bus-sheba.vercel.app",
 ].filter((origin): origin is string => Boolean(origin));
 
 app.use(
