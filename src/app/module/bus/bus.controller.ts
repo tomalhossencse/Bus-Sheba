@@ -72,7 +72,8 @@ const getAllBuses = catchAsync(async (req: Request, res: Response) => {
 		statusCode: httpStatus.OK,
 		success: true,
 		message: "Bus list fetched successfully",
-		data: result,
+		data: result.data,
+		meta: result.meta,
 	});
 });
 
