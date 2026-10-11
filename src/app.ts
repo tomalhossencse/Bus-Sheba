@@ -62,7 +62,7 @@ app.use("/api/v1/analytics", AnalyticsRoutes);
 app.use("/api/v1/tickets", TicketRoutes);
 
 // Basic route
-app.get("/health", async (req: Request, res: Response) => {
+app.get("/api/v1", async (req: Request, res: Response) => {
 	res.status(httpStatus.OK).json({
 		success: true,
 		message: "Welcome to Bus Sheba System Backend",

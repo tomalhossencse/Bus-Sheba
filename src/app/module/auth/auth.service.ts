@@ -373,36 +373,36 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 	let user = isPassengerExistWithGoogle;
 
 	if (!isPassengerExistWithGoogle) {
-		const passengerExistWithCreadential = await prisma.user.findUnique({
+		const passengerExistWithEmail = await prisma.user.findUnique({
 			where: {
 				email: googleIdTokenPayload.email,
 				role: "PASSENGER",
-				authProvider: "CREDENTIAL",
 			},
 		});
 
-		if (passengerExistWithCreadential) {
-			if (!passengerExistWithCreadential.emailVerified) {
+		if (passengerExistWithEmail) {
+			if (!passengerExistWithEmail.emailVerified) {
 				throw new AppError(httpStatus.BAD_REQUEST, "Email is not Verified");
 			}
 
-			if (passengerExistWithCreadential.status === "BLOCKED") {
+			if (passengerExistWithEmail.status === "BLOCKED") {
 				throw new AppError(httpStatus.BAD_REQUEST, "Email is not Verified");
 			}
 
 			if (
-				passengerExistWithCreadential.isDeleted ||
-				passengerExistWithCreadential.status === "DELETED"
+				passengerExistWithEmail.isDeleted ||
+				passengerExistWithEmail.status === "DELETED"
 			) {
 				throw new AppError(httpStatus.NOT_FOUND, "User is deleted");
 			}
 
 			user = await prisma.user.update({
 				where: {
-					id: passengerExistWithCreadential.id,
+					id: passengerExistWithEmail.id,
 				},
 				data: {
 					googleId: googleIdTokenPayload.sub,
+					authProvider: "GOOGLE",
 				},
 			});
 		} else {
@@ -411,6 +411,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 				data: {
 					name: googleIdTokenPayload.name,
 					email: googleIdTokenPayload.email,
+					googleId: googleIdTokenPayload.sub,
 					emailVerified: true,
 					authProvider: "GOOGLE",
 					emailVerifiedAt: new Date(),
