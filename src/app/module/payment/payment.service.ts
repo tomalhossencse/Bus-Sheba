@@ -165,7 +165,7 @@ const paymentCallback = async (query: Record<string, any>) => {
 	}
 
 	const callbackRedirect = (result: "success" | "failure" | "cancelled") =>
-		`${config.frontend_url}/dashboard/my-bookings?status=${result}&bookingId=${paymentRecord.bookingId}`;
+		`${config.frontend_url}/dashboard/passenger/bookings?status=${result}&bookingId=${paymentRecord.bookingId}`;
 
 	if (status === "cancel" || status === "failure") {
 		await prisma.payment.update({
@@ -177,12 +177,17 @@ const paymentCallback = async (query: Record<string, any>) => {
 		});
 
 		return {
-			redirectUrl: callbackRedirect(status === "cancel" ? "cancelled" : "failure"),
+			redirectUrl: callbackRedirect(
+				status === "cancel" ? "cancelled" : "failure",
+			),
 		};
 	}
 
 	if (status !== "success") {
-		throw new AppError(httpStatus.PAYMENT_REQUIRED, "Unknown bKash payment status");
+		throw new AppError(
+			httpStatus.PAYMENT_REQUIRED,
+			"Unknown bKash payment status",
+		);
 	}
 
 	const bkashIdToken = await getBkashIdToken();
@@ -572,8 +577,20 @@ const getAllPayments = async (query: IGetPaymentsQuery) => {
 							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
-					toStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
+					fromStop: {
+						select: {
+							stopName: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
+					toStop: {
+						select: {
+							stopName: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
 					passengers: true,
 					seats: {
 						include: {
@@ -700,8 +717,20 @@ const getMyPayments = async (query: IGetPaymentsQuery, user: RequestUser) => {
 							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
-					toStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
+					fromStop: {
+						select: {
+							stopName: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
+					toStop: {
+						select: {
+							stopName: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
 					passengers: true,
 					seats: {
 						include: {
@@ -774,8 +803,20 @@ const getPaymentById = async (paymentId: string, user: RequestUser) => {
 							route: { select: { source: true, destination: true } },
 						},
 					},
-					fromStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
-					toStop: { select: { stopName: true, arrivalMinutes: true, departureMinutes: true } },
+					fromStop: {
+						select: {
+							stopName: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
+					toStop: {
+						select: {
+							stopName: true,
+							arrivalMinutes: true,
+							departureMinutes: true,
+						},
+					},
 					passengers: true,
 					seats: {
 						include: {
