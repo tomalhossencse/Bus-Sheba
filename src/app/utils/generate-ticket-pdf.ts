@@ -23,6 +23,25 @@ export const formatBangladeshDate = (date: Date) => {
 	}).format(date);
 };
 
+const addMinutesToDate = (date: Date, minutes: number | null | undefined) => {
+	if (minutes === null || minutes === undefined) {
+		return null;
+	}
+
+	return new Date(date.getTime() + minutes * 60 * 1000);
+};
+
+const formatDuration = (start: Date, end: Date) => {
+	const durationMinutes = Math.max(
+		0,
+		Math.round((end.getTime() - start.getTime()) / (60 * 1000)),
+	);
+	const hours = Math.floor(durationMinutes / 60);
+	const minutes = durationMinutes % 60;
+
+	return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
+
 export type TicketBooking = Prisma.BookingGetPayload<{
 	include: {
 		passengers: true;
@@ -205,7 +224,7 @@ export const generateTicketPdf = async (
 	// ==================== 3. JOURNEY DETAILS ====================
 	currentY = drawSectionHeader("Journey & Operator Details", currentY);
 
-	const journeyCardHeight = 135;
+	const journeyCardHeight = 180;
 	pdfDocument
 		.rect(margin, currentY, contentWidth, journeyCardHeight)
 		.fillAndStroke(CARD_BG, BORDER_COLOR);
@@ -285,13 +304,73 @@ export const generateTicketPdf = async (
 		true,
 	);
 
+	const tripDeparture = booking.trip?.departureTime
+		? new Date(booking.trip.departureTime)
+		: null;
+	const tripArrival = booking.trip?.arrivalTime
+		? new Date(booking.trip.arrivalTime)
+		: null;
+	const boardingTime =
+		tripDeparture && booking.fromStop
+			? addMinutesToDate(
+					tripDeparture,
+					booking.fromStop.departureMinutes,
+				)
+			: null;
+	const droppingTime =
+		tripDeparture && booking.toStop
+			? addMinutesToDate(tripDeparture, booking.toStop.arrivalMinutes)
+			: null;
+
 	drawFieldPair(
 		"DEPARTURE TIME",
-		booking.trip?.departureTime
-			? formatBangladeshTime(new Date(booking.trip.departureTime))
-			: "N/A",
+		tripDeparture ? formatBangladeshTime(tripDeparture) : "N/A",
 		rightX,
 		currentY + 102,
+		colWidth,
+		PRIMARY_COLOR,
+		true,
+	);
+
+	// Grid Row 4
+	drawFieldPair(
+		"BOARDING TIME",
+		boardingTime ? formatBangladeshTime(boardingTime) : "N/A",
+		leftX,
+		currentY + 132,
+		colWidth,
+		PRIMARY_COLOR,
+		true,
+	);
+
+	drawFieldPair(
+		"DROPPING TIME",
+		droppingTime ? formatBangladeshTime(droppingTime) : "N/A",
+		rightX,
+		currentY + 132,
+		colWidth,
+		PRIMARY_COLOR,
+		true,
+	);
+
+	// Grid Row 5
+	drawFieldPair(
+		"SCHEDULED ARRIVAL",
+		tripArrival ? formatBangladeshTime(tripArrival) : "N/A",
+		leftX,
+		currentY + 147,
+		colWidth,
+		PRIMARY_COLOR,
+		true,
+	);
+
+	drawFieldPair(
+		"JOURNEY DURATION",
+		tripDeparture && tripArrival
+			? formatDuration(tripDeparture, tripArrival)
+			: "N/A",
+		rightX,
+		currentY + 147,
 		colWidth,
 		PRIMARY_COLOR,
 		true,

@@ -471,7 +471,6 @@ const paymentCallback = async (query: Record<string, any>) => {
 		formatBangladeshTime,
 		formatBangladeshDate,
 	};
-
 	const html = await ejs.renderFile(templatePath, templateData);
 
 	await transporter.sendMail({

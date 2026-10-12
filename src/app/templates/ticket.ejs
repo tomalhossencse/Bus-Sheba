@@ -313,6 +313,18 @@
                                                         <%= booking.bookingNumber %>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Booking Status:</td>
+                                                    <td align="right" style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #059669;">
+                                                        <%= booking.status %>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Issued At:</td>
+                                                    <td align="right" style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                        <%= ticket.issuedAt ? formatBangladeshTime(new Date(ticket.issuedAt)) : 'N/A' %>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </td>
                                     </tr>
@@ -378,6 +390,23 @@
                                 </table>
 
                                 <!-- Journey Information -->
+                                <%
+                                    const tripDeparture = booking.trip.departureTime
+                                        ? new Date(booking.trip.departureTime)
+                                        : null;
+                                    const tripArrival = booking.trip.arrivalTime
+                                        ? new Date(booking.trip.arrivalTime)
+                                        : null;
+                                    const boardingTime = tripDeparture && booking.fromStop.departureMinutes !== null && booking.fromStop.departureMinutes !== undefined
+                                        ? new Date(tripDeparture.getTime() + booking.fromStop.departureMinutes * 60 * 1000)
+                                        : null;
+                                    const droppingTime = tripDeparture && booking.toStop.arrivalMinutes !== null && booking.toStop.arrivalMinutes !== undefined
+                                        ? new Date(tripDeparture.getTime() + booking.toStop.arrivalMinutes * 60 * 1000)
+                                        : null;
+                                    const journeyDuration = tripDeparture && tripArrival
+                                        ? Math.max(0, Math.round((tripArrival.getTime() - tripDeparture.getTime()) / 60000))
+                                        : null;
+                                %>
                                 <table
                                     role="presentation"
                                     width="100%"
@@ -430,7 +459,25 @@
                                                 </tr>
                                                 <tr>
                                                     <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Departure Time:</td>
-                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= formatBangladeshTime(new Date(booking.trip.departureTime)) %></td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= tripDeparture ? formatBangladeshTime(tripDeparture) : 'N/A' %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Boarding Time:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 700; color: #0f766e;"><%= boardingTime ? formatBangladeshTime(boardingTime) : 'N/A' %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Dropping Time:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 700; color: #0f766e;"><%= droppingTime ? formatBangladeshTime(droppingTime) : 'N/A' %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Scheduled Arrival:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= tripArrival ? formatBangladeshTime(tripArrival) : 'N/A' %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Journey Duration:</td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
+                                                        <%= journeyDuration !== null ? `${Math.floor(journeyDuration / 60)}h ${journeyDuration % 60}m` : 'N/A' %>
+                                                    </td>
                                                 </tr>
                                             </table>
                                         </td>
