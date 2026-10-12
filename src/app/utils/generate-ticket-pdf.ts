@@ -224,7 +224,7 @@ export const generateTicketPdf = async (
 	// ==================== 3. JOURNEY DETAILS ====================
 	currentY = drawSectionHeader("Journey & Operator Details", currentY);
 
-	const journeyCardHeight = 180;
+	const journeyCardHeight = 195;
 	pdfDocument
 		.rect(margin, currentY, contentWidth, journeyCardHeight)
 		.fillAndStroke(CARD_BG, BORDER_COLOR);
@@ -358,7 +358,7 @@ export const generateTicketPdf = async (
 		"SCHEDULED ARRIVAL",
 		tripArrival ? formatBangladeshTime(tripArrival) : "N/A",
 		leftX,
-		currentY + 147,
+		currentY + 162,
 		colWidth,
 		PRIMARY_COLOR,
 		true,
@@ -370,7 +370,7 @@ export const generateTicketPdf = async (
 			? formatDuration(tripDeparture, tripArrival)
 			: "N/A",
 		rightX,
-		currentY + 147,
+		currentY + 162,
 		colWidth,
 		PRIMARY_COLOR,
 		true,
