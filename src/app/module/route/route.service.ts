@@ -5,7 +5,6 @@ import { RequestUser } from "../../types/types";
 import { AppError } from "../../utils/AppError";
 import { AddRoutePayload, UpdateRoutePayload } from "./route.validation";
 import { IRouteQuery } from "./route.interface";
-import { AddRouteStopPayload } from "../routeStop/routeStop.validation";
 
 const addRoute = async (payload: AddRoutePayload, user: RequestUser) => {
 	const isUserExist = await prisma.user.findUnique({
@@ -268,7 +267,7 @@ const getAllRoutes = async (query: IRouteQuery) => {
 
 	if (query.isActive !== undefined) {
 		andConditions.push({
-			isActive: query.isActive,
+			isActive: String(query.isActive) === "true",
 		});
 	}
 
