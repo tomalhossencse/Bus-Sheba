@@ -11,7 +11,11 @@ import ejs from "ejs";
 import { transporter } from "../../lib/nodemailer";
 import { UploadApiResponse } from "cloudinary";
 import { cloudinary } from "../../lib/cloudinary";
-import { generateTicketPdf } from "../../utils/generate-ticket-pdf";
+import {
+	formatBangladeshDate,
+	formatBangladeshTime,
+	generateTicketPdf,
+} from "../../utils/generate-ticket-pdf";
 import { IGetPaymentsQuery } from "./payment.interface";
 import { PaymentWhereInput } from "../../../generated/prisma/models";
 
@@ -374,8 +378,8 @@ const paymentCallback = async (query: Record<string, any>) => {
 		},
 
 		{
-			maxWait: 5000,
-			timeout: 10000,
+			maxWait: 10000,
+			timeout: 30000,
 		},
 	);
 
@@ -463,6 +467,9 @@ const paymentCallback = async (query: Record<string, any>) => {
 		ticket: updatedTicket,
 
 		ticketPdfUrl: ticketPdfResult.secure_url,
+
+		formatBangladeshTime,
+		formatBangladeshDate,
 	};
 
 	const html = await ejs.renderFile(templatePath, templateData);

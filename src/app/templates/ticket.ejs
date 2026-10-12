@@ -426,11 +426,11 @@
                                                 </tr>
                                                 <tr>
                                                     <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Travel Date:</td>
-                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= new Date(booking.trip.travelDate).toDateString() %></td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= formatBangladeshDate(new Date(booking.trip.travelDate)) %></td>
                                                 </tr>
                                                 <tr>
                                                     <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Departure Time:</td>
-                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= new Date(booking.trip.departureTime).toLocaleTimeString() %></td>
+                                                    <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;"><%= formatBangladeshTime(new Date(booking.trip.departureTime)) %></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -516,7 +516,7 @@
                                                     <tr>
                                                         <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Paid At:</td>
                                                         <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
-                                                            <%= new Date(payment.paidAt).toLocaleString() %>
+                                                            <%= formatBangladeshTime(new Date(payment.paidAt)) %>
                                                         </td>
                                                     </tr>
                                                 <% } %>

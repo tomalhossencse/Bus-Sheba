@@ -2,6 +2,27 @@ import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
 import { Prisma } from "../../generated/prisma/client";
 
+export const formatBangladeshTime = (date: Date) => {
+	return new Intl.DateTimeFormat("en-GB", {
+		timeZone: "Asia/Dhaka",
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: true,
+	}).format(date);
+};
+
+export const formatBangladeshDate = (date: Date) => {
+	return new Intl.DateTimeFormat("en-GB", {
+		timeZone: "Asia/Dhaka",
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	}).format(date);
+};
+
 export type TicketBooking = Prisma.BookingGetPayload<{
 	include: {
 		passengers: true;
@@ -173,11 +194,7 @@ export const generateTicketPdf = async (
 
 	drawFieldPair(
 		"ISSUED DATE",
-		new Date(booking.createdAt).toLocaleDateString("en-GB", {
-			day: "2-digit",
-			month: "short",
-			year: "numeric",
-		}),
+		formatBangladeshTime(new Date(booking.createdAt)),
 		margin + summaryColWidth * 2 + 12,
 		currentY + 7,
 		summaryColWidth - 12,
@@ -259,7 +276,7 @@ export const generateTicketPdf = async (
 	drawFieldPair(
 		"TRAVEL DATE",
 		booking.trip?.travelDate
-			? new Date(booking.trip.travelDate).toDateString()
+			? formatBangladeshDate(new Date(booking.trip.travelDate))
 			: "N/A",
 		leftX,
 		currentY + 102,
@@ -271,10 +288,7 @@ export const generateTicketPdf = async (
 	drawFieldPair(
 		"DEPARTURE TIME",
 		booking.trip?.departureTime
-			? new Date(booking.trip.departureTime).toLocaleTimeString([], {
-					hour: "2-digit",
-					minute: "2-digit",
-				})
+			? formatBangladeshTime(new Date(booking.trip.departureTime))
 			: "N/A",
 		rightX,
 		currentY + 102,
@@ -397,7 +411,7 @@ export const generateTicketPdf = async (
 	);
 
 	const paidAtText = booking.payment?.paidAt
-		? new Date(booking.payment.paidAt).toLocaleDateString("en-GB")
+		? formatBangladeshTime(new Date(booking.payment.paidAt))
 		: "N/A";
 	drawFieldPair(
 		"PAID DATE",
