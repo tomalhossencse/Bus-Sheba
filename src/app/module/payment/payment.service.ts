@@ -13,6 +13,7 @@ import { UploadApiResponse } from "cloudinary";
 import { cloudinary } from "../../lib/cloudinary";
 import {
 	formatBangladeshDate,
+	formatBangladeshDateTime,
 	formatBangladeshTime,
 	generateTicketPdf,
 } from "../../utils/generate-ticket-pdf";
@@ -470,6 +471,7 @@ const paymentCallback = async (query: Record<string, any>) => {
 
 		formatBangladeshTime,
 		formatBangladeshDate,
+		formatBangladeshDateTime,
 	};
 	const html = await ejs.renderFile(templatePath, templateData);
 

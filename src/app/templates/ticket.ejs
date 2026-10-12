@@ -322,7 +322,7 @@
                                                 <tr>
                                                     <td style="padding: 6px 0; font-size: 14px; color: #64748b;">Issued At:</td>
                                                     <td align="right" style="padding: 6px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
-                                                        <%= ticket.issuedAt ? formatBangladeshTime(new Date(ticket.issuedAt)) : 'N/A' %>
+                                                        <%= ticket.issuedAt ? formatBangladeshDateTime(new Date(ticket.issuedAt)) : 'N/A' %>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -561,9 +561,9 @@
                                                 </tr>
                                                 <% if (payment.paidAt) { %>
                                                     <tr>
-                                                        <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Paid At:</td>
+                                                        <td style="padding: 5px 0; font-size: 14px; color: #64748b;">Paid Date:</td>
                                                         <td align="right" style="padding: 5px 0; font-size: 14px; font-weight: 600; color: #0f172a;">
-                                                            <%= formatBangladeshTime(new Date(payment.paidAt)) %>
+                                                        <%= formatBangladeshDateTime(new Date(payment.paidAt)) %>
                                                         </td>
                                                     </tr>
                                                 <% } %>

@@ -5,6 +5,15 @@ import { Prisma } from "../../generated/prisma/client";
 export const formatBangladeshTime = (date: Date) => {
 	return new Intl.DateTimeFormat("en-GB", {
 		timeZone: "Asia/Dhaka",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: true,
+	}).format(date);
+};
+
+export const formatBangladeshDateTime = (date: Date) => {
+	return new Intl.DateTimeFormat("en-GB", {
+		timeZone: "Asia/Dhaka",
 		day: "2-digit",
 		month: "2-digit",
 		year: "numeric",
@@ -213,7 +222,7 @@ export const generateTicketPdf = async (
 
 	drawFieldPair(
 		"ISSUED DATE",
-		formatBangladeshTime(new Date(booking.createdAt)),
+		formatBangladeshDateTime(new Date(booking.createdAt)),
 		margin + summaryColWidth * 2 + 12,
 		currentY + 7,
 		summaryColWidth - 12,
@@ -490,7 +499,7 @@ export const generateTicketPdf = async (
 	);
 
 	const paidAtText = booking.payment?.paidAt
-		? formatBangladeshTime(new Date(booking.payment.paidAt))
+		? formatBangladeshDateTime(new Date(booking.payment.paidAt))
 		: "N/A";
 	drawFieldPair(
 		"PAID DATE",
