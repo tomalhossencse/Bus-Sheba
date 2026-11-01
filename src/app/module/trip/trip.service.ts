@@ -914,6 +914,15 @@ const getAllTrips = async (query: ITripQuery) => {
 		});
 	}
 
+	if (query.upcoming === "true") {
+		const now = new Date();
+		andConditions.push({
+			departureTime: {
+				gte: now,
+			},
+		});
+	}
+
 	if (query.busType) {
 		andConditions.push({
 			bus: {

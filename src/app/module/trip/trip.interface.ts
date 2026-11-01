@@ -14,4 +14,5 @@ export interface ITripQuery extends TripWhereInput {
 	status?: TripStatus;
 	minFare?: number;
 	maxFare?: number;
+	upcoming?: string;
 }
