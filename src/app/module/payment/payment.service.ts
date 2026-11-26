@@ -100,7 +100,7 @@ const createPayment = async (
 				mode: "0011",
 				payerReference: "01929918378",
 				// payerReference: user.email,
-				callbackURL: `${config.bkash_callback_url}/payment/callback`,
+				callbackURL: `${config.bkash_callback_url.replace(/\/+$/, "")}/callback`,
 				merchantAssociationInfo: "MI05MID54RF09123456One",
 				amount: booking.totalAmount.toString(),
 				currency: "BDT",
@@ -112,15 +112,35 @@ const createPayment = async (
 
 	const bkashCreatePaymentResult = await bkashCreatePaymentRes.json();
 
+	if (bkashCreatePaymentResult.statusCode !== "0000") {
+		throw new AppError(
+			httpStatus.BAD_GATEWAY,
+			`bKash payment initialization failed: ${
+				bkashCreatePaymentResult.statusMessage || "Unknown gateway error"
+			}`,
+		);
+	}
+
+	if (
+		typeof bkashCreatePaymentResult.paymentID !== "string" ||
+		!bkashCreatePaymentResult.paymentID ||
+		typeof bkashCreatePaymentResult.bkashURL !== "string" ||
+		!bkashCreatePaymentResult.bkashURL
+	) {
+		throw new AppError(
+			httpStatus.BAD_GATEWAY,
+			"bKash returned an incomplete payment initialization response",
+		);
+	}
+
 	const transactionResult = await prisma.$transaction(async (tx) => {
 		const payment = existingPayment
 			? await tx.payment.update({
 					where: { id: existingPayment.id },
 					data: {
-						merchantInvoiceNumber:
-							bkashCreatePaymentResult.merchantInvoiceNumber,
-						amount: bkashCreatePaymentResult.amount,
-						currency: bkashCreatePaymentResult.currency,
+						merchantInvoiceNumber: booking.id,
+						amount: booking.totalAmount,
+						currency: "BDT",
 						gatewayResponse: bkashCreatePaymentResult,
 						paymentID: bkashCreatePaymentResult.paymentID,
 						payerReference: user.email,
@@ -131,11 +151,10 @@ const createPayment = async (
 				})
 			: await tx.payment.create({
 					data: {
-						merchantInvoiceNumber:
-							bkashCreatePaymentResult.merchantInvoiceNumber,
+						merchantInvoiceNumber: booking.id,
 						bookingId: booking.id,
-						amount: bkashCreatePaymentResult.amount,
-						currency: bkashCreatePaymentResult.currency,
+						amount: booking.totalAmount,
+						currency: "BDT",
 						gatewayResponse: bkashCreatePaymentResult,
 						paymentID: bkashCreatePaymentResult.paymentID,
 						payerReference: user.email,
